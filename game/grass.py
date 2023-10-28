@@ -5,7 +5,7 @@ class Grass1:
         self.image = load_image('beachbkg.png')
 
     def draw(self):
-        self.image.draw(400, 20)
+        self.image.draw(400,300,800,600)
 
     def update(self):
         pass
