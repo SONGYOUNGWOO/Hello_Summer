@@ -1,5 +1,4 @@
-from pico2d import load_image
-
+from pico2d import load_image, get_time , delay
 
 class Grass1:
     def __init__(self):
@@ -13,11 +12,13 @@ class Grass1:
 
 
 class Grass2:
+
     def __init__(self):
-        self.image = load_image('beachbkg.png')
+        self.frame = 0
+        self.x, self.y = 400, 270
+        self.image = load_image('net.png') #270 x450 :6
+    def update(self):
+        self.frame = (self.frame + 1) % 6
 
     def draw(self):
-        self.image.draw(400, 50)
-
-    def update(self):
-        pass
+        self.image.clip_composite_draw(self.frame * 45, 0, 45, 450,  - 3.141592 / 100, '', self.x, self.y, 45, 510)

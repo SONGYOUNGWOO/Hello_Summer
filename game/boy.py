@@ -1,29 +1,20 @@
 # 이것은 각 상태들을 객체로 구현한 것임.
-
-from pico2d import get_time, load_image, SDL_KEYDOWN, SDL_KEYUP, SDLK_SPACE, SDLK_LEFT, SDLK_RIGHT
+from pico2d import (get_time, load_image, SDL_KEYDOWN, SDL_KEYUP, SDLK_SPACE, SDLK_LEFT, SDLK_RIGHT, SDLK_w, SDLK_a,
+                    SDLK_s, SDLK_d)
 from ball import Ball
 import game_world
-
 
 # state event check
 # ( state event type, event value )
 
 def right_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_RIGHT
-
-
 def right_up(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_RIGHT
-
-
 def left_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_LEFT
-
-
 def left_up(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_LEFT
-
-
 def space_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
 
@@ -111,10 +102,10 @@ class Sleep:
     def draw(boy):
         if boy.face_dir == -1:
             boy.image_idle.clip_composite_draw(boy.frame * 32, 0, 32, 43,
-                                               -3.141592 / 2, '', boy.x + 25, boy.y - 25, 100, 100)
+                                               -3.141592 / 2, '', boy.x + 25, boy.y - 25, 32,43)
         else:
             boy.image_idle.clip_composite_draw(boy.frame * 32, 0, 32, 43,
-                                               3.141592 / 2, '', boy.x - 25, boy.y - 25, 100, 100)
+                                               3.141592 / 2, '', boy.x - 25, boy.y - 25, 32,43)
 
 
 class StateMachine:
