@@ -1,0 +1,9 @@
+이름			최선 	평균 	최악	메모리	stable
+버블소트			n	n^2	n^2	1	yes
+선택정렬			n^2	n^2	n^2	1	no
+삽입정렬(insertion)	n	n^2	n^2	l	yes
+쉘소트			nlgn	n^1.5	n^1.6 	1	no
+
+힙소트			nlgn	nlgn	nlgn	1	no
+머지소트(합병)		nlgn	nlgn 	nlgn	n	yes
+큇소트			nlgn	nlgn	n^2	lgn	no
