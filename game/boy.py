@@ -155,7 +155,7 @@ class Boy:
         self.action = 3
         self.dir = 0
         self.face_dir = 1 #얼굴이 바라보는 방향 1오른쪾 -1왼쪽
-        self.image = load_image('animation_sheet.png')
+        self.image = load_image('playerRun.png')
         self.state_machine = StateMachine(self)
         self.state_machine.start()
 
