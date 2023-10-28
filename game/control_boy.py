@@ -26,7 +26,7 @@ def handle_events():
 def create_world():
     global running
     global grass
-    # global grass2
+    global grass2
     global team
     global boy
 
