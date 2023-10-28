@@ -3,10 +3,10 @@ from pico2d import load_image
 
 class Grass1:
     def __init__(self):
-        self.image = load_image('beachbkg.png')
+        self.image_grass = load_image('beachbkg.png')
 
     def draw(self):
-        self.image.draw(400, 300, 800, 600)
+        self.image_grass.draw(400, 300, 800, 600)
 
     def update(self):
         pass
