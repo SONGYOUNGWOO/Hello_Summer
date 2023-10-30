@@ -1,20 +1,28 @@
 from pico2d import load_image
 import game_world
+import random
 
-class Ball:
+class Boll:
     image = None
 
-    def __init__(self, x = 400, y = 300, velocity = 1):
-        if Ball.image == None:
-            Ball.image = load_image('ballRoll.png')
-        self.x, self.y, self.velocity = x, y, velocity
+    def __init__(self):
+        if Boll.image == None:
+            Boll.image = load_image('ballRoll.png') # 120x 70
+        self.x, self.y = random.randint(0, 800), 599
+        self.frame = 0
 
-    def draw(self):
-        self.image.draw(self.x, self.y)
 
     def update(self):
-        self.x += self.velocity
+        self.frame = (self.frame + 1) % 8
+        if self.y > 70:
+            self.y -= random.randint(1, 30)
 
-        if self.x < 50 or self.x > 800 -50:
-            game_world.remove_object(self)
+
+    def draw(self):
+        self.image.clip_draw(self.frame * 15, 0, 15, 70, self.x, self.y, 15, 70)
+
+
+
+
+
 

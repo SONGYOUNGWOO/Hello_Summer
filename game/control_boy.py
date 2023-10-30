@@ -4,6 +4,7 @@ from grass import Grass1
 from grass import Grass2
 
 from boy import Boy
+from ball import Boll
 import game_world
 
 
@@ -29,6 +30,7 @@ def create_world():
     global grass2
     global team
     global boy
+    global boll
 
     running = True
 
@@ -38,7 +40,9 @@ def create_world():
     game_world.add_objects(grass2, 0)
 
     boy = Boy()
+    boll = Boll()
     game_world.add_objects(boy, 1)
+    game_world.add_objects(boll, 1)
 
 
 def update_world():

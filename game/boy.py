@@ -1,7 +1,8 @@
 # 이것은 각 상태들을 객체로 구현한 것임.
 from pico2d import (get_time, load_image, SDL_KEYDOWN, SDL_KEYUP, SDLK_SPACE, SDLK_LEFT, SDLK_RIGHT, SDLK_w, SDLK_a,
-                    SDLK_s, SDLK_d, SDLK_k)
-from ball import Ball
+                    SDLK_s, SDLK_d, SDLK_k, SDLK_p)
+
+from ball import Boll
 import game_world
 # state event check
 # ( state event type, event value )
@@ -32,6 +33,9 @@ def space_up(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_SPACE
 def K_down(e): #아래
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_k
+def P_down(e): #아래
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_p
+
 
 
 def time_out(e):
@@ -56,6 +60,8 @@ class Idle:
 
     @staticmethod
     def exit(boy, e):
+        if P_down(e):
+            boy.fire_ball()
         pass
 
     @staticmethod
@@ -83,6 +89,8 @@ class Run:
 
     @staticmethod
     def exit(boy, e):
+        if P_down(e):
+            boy.fire_ball()
         pass
 
     @staticmethod
@@ -108,30 +116,32 @@ class Jump:
     def enter(boy, e):
         boy.dir, boy.face_dir, boy.action = 1, 1, 5
         boy.frame = 0
-        global beg_y, end_y
-        beg_y = boy.y
-        end_y = beg_y + 100
+        global beg
+        beg = boy.y
+        boy.wait_time = get_time()  # pico2d import 필요
         pass
 
     @staticmethod
     def exit(boy, e):
+        if P_down(e):
+            boy.fire_ball()
         pass
 
     @staticmethod
     def do(boy):
-        if boy.y < end_y:
-            boy.frame = (boy.frame + 1) % 13
-            boy.y += boy.dir * 50
-        else:
-            boy.y = beg_y
+        boy.frame = (boy.frame + 1) % 13
+        boy.y += boy.dir * 2
+        if get_time() - boy.wait_time > 1:
+            boy.y = beg
+            boy.state_machine.handle_event(('TIME_OUT', 0))
 
     @staticmethod
     def draw(boy):
         if boy.face_dir == 1:
-            boy.image_jump.clip_draw(boy.frame * 32, 0, 32, 50, boy.x, boy.y, 32,50)
+            boy.image_block.clip_draw(32 * 7, 0, 32, 46, boy.x, boy.y, 32,46)
         else:
-            boy.image_jump.clip_composite_draw(boy.frame * 32, 0, 32, 50,
-                                              0, 'h', boy.x , boy.y, 32, 50)
+            boy.image_block.clip_composite_draw(32 * 7, 0, 32, 46,
+                                              0, 'h', boy.x , boy.y, 32, 46)
 class Reception:
     @staticmethod
     def enter(boy, e):
@@ -167,8 +177,8 @@ class StateMachine:
                    space_down: Jump, K_down: Reception},
             Run: {D_down: Idle, A_down: Idle, D_up: Idle, A_up: Idle,
                   W_down: Idle, S_down: Idle, W_up: Idle, S_up: Idle,
-                  space_down: Jump,K_down: Reception},
-            Jump: {space_up: Idle},
+                  space_down: Jump, K_down: Reception},
+            Jump: {time_out: Idle},
             Reception: {D_down: Run, A_down: Run, D_up:  Idle, A_up:  Idle,
                    W_down: Run, S_down: Run, W_up:  Idle, S_up:  Idle,
                    space_down: Jump}
@@ -204,6 +214,7 @@ class Boy:
         self.image_idle = load_image('playerIdle.png') # 384 x 43
         self.image_run = load_image('playerRun.png') # 384 x 43
         self.image_jump = load_image('playerSmash.png') # 416 x 50
+        self.image_block = load_image('playerBlock.png') # 416 x 46
         self.image_reception = load_image('playerReception.png') # 352 x 43
         self.state_machine = StateMachine(self)
         self.state_machine.start()
@@ -218,7 +229,7 @@ class Boy:
         self.state_machine.draw()
 
     def fire_ball(self):
-        ball = Ball(self.x, self.y + 5, self.face_dir * 10)
+        ball = Boll(self.x, self.y + 5, self.face_dir * 10)
         game_world.add_objects(ball, 0)
 
         if self.face_dir == -1:  # 왼쪽
