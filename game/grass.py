@@ -11,14 +11,17 @@ class Grass1:
         pass
 
 
-class Grass2:
-
+class Net:
     def __init__(self):
+        self.bool = False
         self.frame = 0
         self.x, self.y = 400, 270
         self.image = load_image('net.png') #270 x450 :6
     def update(self):
-        self.frame = (self.frame + 1) % 6
-
+        if self.bool:
+            self.frame = (self.frame + 1) % 6
+            self.bool = False
+        else:
+            self.bool = True
     def draw(self):
         self.image.clip_composite_draw(self.frame * 45, 0, 45, 450,  - 3.141592 / 100, '', self.x, self.y, 45, 510)

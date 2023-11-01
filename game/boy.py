@@ -72,7 +72,7 @@ class Idle:
 
     @staticmethod
     def draw(boy):
-        boy.image_idle.clip_draw(boy.frame * 32, 0, 32, 43, boy.x, boy.y)
+        boy.image_idle.clip_draw(boy.frame * 32, 0, 32, 43, boy.x, boy.y, 48, 65)
 
 class Run:
     # 1:왼쪽 2:오른쪽 3:위 4:아래 5:점프
@@ -106,9 +106,9 @@ class Run:
     def draw(boy):
         if boy.dir == -1:  # 왼쪽
             boy.image_run.clip_composite_draw(boy.frame * 32, 0, 32, 43, 0, 'h',
-                                              boy.x, boy.y, 32, 43)
+                                              boy.x, boy.y, 48, 65)
         else:
-            boy.image_run.clip_draw(boy.frame * 32, 0, 32, 43, boy.x, boy.y)
+            boy.image_run.clip_draw(boy.frame * 32, 0, 32, 43, boy.x, boy.y, 48, 65)
 
 
 class Jump:
@@ -130,18 +130,19 @@ class Jump:
     @staticmethod
     def do(boy):
         boy.frame = (boy.frame + 1) % 13
-        boy.y += boy.dir * 2
-        if get_time() - boy.wait_time > 1:
-            boy.y = beg
+        boy.y += boy.dir * 15
+        if get_time() - boy.wait_time > 0.1: #시간으로 속도 조정
+            boy.y -= boy.dir * 30
+        if get_time() - boy.wait_time > 0.2:
             boy.state_machine.handle_event(('TIME_OUT', 0))
 
     @staticmethod
     def draw(boy):
         if boy.face_dir == 1:
-            boy.image_block.clip_draw(32 * 7, 0, 32, 46, boy.x, boy.y, 32,46)
+            boy.image_block.clip_draw(32 * 7, 0, 32, 46, boy.x, boy.y, 48, 65)
         else:
             boy.image_block.clip_composite_draw(32 * 7, 0, 32, 46,
-                                              0, 'h', boy.x , boy.y, 32, 46)
+                                              0, 'h', boy.x , boy.y, 48, 65)
 class Reception:
     @staticmethod
     def enter(boy, e):
@@ -161,10 +162,10 @@ class Reception:
     @staticmethod
     def draw(boy):
         if boy.face_dir == 1:
-            boy.image_reception.clip_draw(boy.frame * 32, 0, 32, 43, boy.x, boy.y, 32, 43)
+            boy.image_reception.clip_draw(boy.frame * 32, 0, 32, 43, boy.x, boy.y, 48, 65)
         else:
             boy.image_reception.clip_composite_draw(boy.frame * 32, 0, 32, 50,
-                                              0, 'h', boy.x , boy.y, 32, 43)
+                                              0, 'h', boy.x , boy.y, 48, 65)
 
 
 class StateMachine:

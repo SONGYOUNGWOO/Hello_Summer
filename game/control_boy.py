@@ -1,7 +1,7 @@
 from pico2d import *
 
 from grass import Grass1
-from grass import Grass2
+from grass import Net
 
 from boy import Boy
 from ball import Boll
@@ -35,9 +35,9 @@ def create_world():
     running = True
 
     grass = Grass1()
-    grass2 = Grass2()
+    net = Net()
     game_world.add_objects(grass, 0)
-    game_world.add_objects(grass2, 0)
+    game_world.add_objects(net, 0)
 
     boy = Boy()
     boll = Boll()
