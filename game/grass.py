@@ -23,5 +23,6 @@ class Net:
             self.bool = False
         else:
             self.bool = True
+
     def draw(self):
         self.image.clip_composite_draw(self.frame * 45, 0, 45, 450,  - 3.141592 / 100, '', self.x, self.y, 45, 510)
