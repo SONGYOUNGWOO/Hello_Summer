@@ -27,14 +27,13 @@ def S_down(e): #아래
 def S_up(e): #아래
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_s
 
-
 def space_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
 def space_up(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_SPACE
 def K_down(e): #아래
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_k
-def P_down(e): #아래
+def P_down(e): #리시브
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_p
 
 def time_out(e):
@@ -57,10 +56,7 @@ FRAMES_PER_ACTION = 12
 
 
 # time_out = lambda e : e[0] == 'TIME_OUT'
-
-#1:왼쪽 2:오른쪽 3:위 4:아래 5:점프
 class Idle:
-    # 1:왼쪽 2:오른쪽 3:위 4:아래 5:점프
     @staticmethod
     def enter(player, e):
         if player.face_dir == '왼쪽':
@@ -141,8 +137,6 @@ class Jump:
 
     @staticmethod
     def exit(player, e):
-        if P_down(e):
-            player.fire_ball()
         pass
 
     @staticmethod
@@ -161,11 +155,12 @@ class Jump:
         else:
             player.image_block.clip_composite_draw(32 * 7, 0, 32, 46,
                                               0, 'h', player.x , player.y, 48, 65)
-class Reception:
+class Reception:# 352 x 43 , 11, 32
     @staticmethod
     def enter(player, e):
-        player.dir, player.face_dir, player.action = 1, '오른쪽', '리시브'
+        player.action = '리시브'
         player.frame = 0
+        player.wait_time = get_time()  # pico2d import 필요
         pass
 
     @staticmethod
@@ -174,12 +169,13 @@ class Reception:
 
     @staticmethod
     def do(player):
-        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
-
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 11
+        if get_time() - player.wait_time > 0.5:  # 시간으로 속도 조정
+            player.state_machine.handle_event(('TIME_OUT', 0))
 
     @staticmethod
     def draw(player):
-        if player.face_dir == 1:
+        if player.face_dir == '오른쪽':
             player.image_reception.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
         else:
             player.image_reception.clip_composite_draw(int(player.frame) * 32, 0, 32, 50,
@@ -193,14 +189,14 @@ class StateMachine:
         self.transitions = {
             Idle: {D_down: Run, A_down: Run, D_up:  Idle, A_up:  Idle,
                    W_down: Run, S_down: Run, W_up:  Idle, S_up:  Idle,
-                   space_down: Jump, K_down: Reception},
+                   space_down: Jump, P_down: Reception},
             Run: {D_down: Idle, A_down: Idle, D_up: Idle, A_up: Idle,
                   W_down: Idle, S_down: Idle, W_up: Idle, S_up: Idle,
-                  space_down: Jump, K_down: Reception},
+                  space_down: Jump, P_down: Reception},
             Jump: {time_out: Idle},
             Reception: {D_down: Run, A_down: Run, D_up:  Idle, A_up:  Idle,
                    W_down: Run, S_down: Run, W_up:  Idle, S_up:  Idle,
-                   space_down: Jump}
+                   space_down: Jump, time_out: Idle}
         }
 
     def start(self):
@@ -234,7 +230,7 @@ class Player:
         self.image_run = load_image('./player/playerRun.png') # 384 x 43
         self.image_jump = load_image('./player/playerSmash.png') # 416 x 50
         self.image_block = load_image('./player/playerBlock.png') # 416 x 46
-        self.image_reception = load_image('./player/playerReception.png') # 352 x 43
+        self.image_reception = load_image('./player/playerReception.png') # 352 x 43 , 11, 32
         self.state_machine = StateMachine(self)
         self.state_machine.start()
 
@@ -261,10 +257,11 @@ class Player:
         #     exit(1)
 
     def fire_ball(self):
-        ball = Ball(self.x, self.y + 5, self.face_dir * 10)
-        game_world.add_objects(ball, 0)
-
-        if self.face_dir == '왼쪾':
-            print('FIRE BALL to LEFT')
-        elif self.face_dir == '오른쪽':
-            print('FIRE BALL to RIGHT')
+        pass
+        # ball = Ball(self.x, self.y + 5, self.face_dir * 10)
+        # game_world.add_objects(ball, 0)
+        #
+        # if self.face_dir == '왼쪾':
+        #     print('FIRE BALL to LEFT')
+        # elif self.face_dir == '오른쪽':
+        #     print('FIRE BALL to RIGHT')
