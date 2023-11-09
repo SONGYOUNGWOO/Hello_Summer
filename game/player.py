@@ -63,10 +63,10 @@ class Idle:
     # 1:왼쪽 2:오른쪽 3:위 4:아래 5:점프
     @staticmethod
     def enter(player, e):
-        if player.face_dir == -1:
-            player.action = 1
-        elif player.face_dir == 1:
-            player.action = 2
+        if player.face_dir == '왼쪽':
+            player.action = '좌'
+        elif player.face_dir == '오른쪽':
+            player.action = '우'
         player.dir = 0
         player.frame = 0
         player.wait_time = get_time()  # pico2d import 필요
@@ -86,20 +86,24 @@ class Idle:
 
     @staticmethod
     def draw(player):
-        player.image_idle.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        if player.face_dir == '오른쪽':
+            player.image_idle.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        else:
+            player.image_idle.clip_composite_draw(int(player.frame) * 32, 0, 32, 43,
+                                                   0, 'h', player.x, player.y, 48, 65)
 
 class Run:
     # 1:왼쪽 2:오른쪽 3:위 4:아래 5:점프
     @staticmethod
     def enter(player, e):
-        if A_down(e) or A_up(e):  # 왼쪽으로 RUN
-            player.dir, player.face_dir, player.action = -1, -1, 1
-        elif D_down(e) or D_up(e):  # 오른쪽으로 RUN
-            player.dir, player.face_dir, player.action = 1, 1, 2
-        elif W_down(e) or W_up(e):  # 오른쪽으로 RUN
-            player.dir, player.face_dir, player.action = 1, 1, 3
-        elif S_down(e) or S_up(e):  # 오른쪽으로 RUN
-            player.dir, player.face_dir, player.action = -1, 1, 4
+        if A_down(e) or A_up(e):
+            player.dir, player.face_dir, player.action = -1, '왼쪽', '좌'
+        elif D_down(e) or D_up(e):
+            player.dir, player.face_dir, player.action = 1, '오른쪽', '우'
+        elif W_down(e) or W_up(e):
+            player.dir, player.face_dir, player.action = 1, '오른쪽', '위'
+        elif S_down(e) or S_up(e):
+            player.dir, player.face_dir, player.action = -1, '오른쪽', '아래'
 
     @staticmethod
     def exit(player, e):
@@ -110,7 +114,7 @@ class Run:
     @staticmethod
     def do(player):
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
-        if player.action < 3:
+        if player.action == '좌' or player.action == '우':
             player.x += player.dir * RUN_SPEED_PPS * game_framework.frame_time
         else:
             player.y += player.dir * RUN_SPEED_PPS * game_framework.frame_time
@@ -128,7 +132,7 @@ class Run:
 class Jump:
     @staticmethod
     def enter(player, e):
-        player.dir, player.face_dir, player.action = 1, 1, 5
+        player.dir, player.action = 1, '점프'
         player.frame = 0
         global beg
         beg = player.y
@@ -152,7 +156,7 @@ class Jump:
 
     @staticmethod
     def draw(player):
-        if player.face_dir == 1:
+        if player.face_dir == '오른쪽':
             player.image_block.clip_draw(32 * 7, 0, 32, 46, player.x, player.y, 48, 65)
         else:
             player.image_block.clip_composite_draw(32 * 7, 0, 32, 46,
@@ -160,7 +164,7 @@ class Jump:
 class Reception:
     @staticmethod
     def enter(player, e):
-        player.dir, player.face_dir, player.action = 1, 1, 6
+        player.dir, player.face_dir, player.action = 1, '오른쪽', '리시브'
         player.frame = 0
         pass
 
@@ -223,9 +227,9 @@ class Player:
     def __init__(self):
         self.x, self.y = 400, 40
         self.frame = 0
-        self.action = 2 #1:왼쪽 2:오른쪽 3:위 4:아래 5:점프
+        self.action = '우'
         self.dir = 0
-        self.face_dir = 1  # 얼굴이 바라보는 방향 1오른쪾 -1왼쪽
+        self.face_dir = '오른쪽'
         self.image_idle = load_image('./player/playerIdle.png') # 384 x 43
         self.image_run = load_image('./player/playerRun.png') # 384 x 43
         self.image_jump = load_image('./player/playerSmash.png') # 416 x 50
@@ -260,7 +264,7 @@ class Player:
         ball = Ball(self.x, self.y + 5, self.face_dir * 10)
         game_world.add_objects(ball, 0)
 
-        if self.face_dir == -1:  # 왼쪽
+        if self.face_dir == '왼쪾':
             print('FIRE BALL to LEFT')
-        elif self.face_dir == 1:  # 오른쪽
+        elif self.face_dir == '오른쪽':
             print('FIRE BALL to RIGHT')
