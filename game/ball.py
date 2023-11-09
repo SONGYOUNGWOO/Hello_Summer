@@ -2,12 +2,12 @@ from pico2d import load_image
 import game_world
 import random
 
-class Boll:
+class Ball:
     image = None
 
     def __init__(self):
-        if Boll.image == None:
-            Boll.image = load_image('./ball/ballRoll.png') # 120x 70
+        if Ball.image == None:
+            Ball.image = load_image('./ball/ballRoll.png') # 120x 70
         self.x, self.y = random.randint(0, 800), 599
         self.frame = 0
 

@@ -51,6 +51,8 @@ def remove_object(o):
     for layer in objects:
         if o in layer:
             layer.remove(o)
+            remove_collision_object(o)
+            del o
             return
     raise ValueError('Cannot delete non existing object, 존재하지 않는 객체는 못지운다구 !!!')
 
