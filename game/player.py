@@ -80,7 +80,7 @@ class Idle:
 
     @staticmethod
     def do(player):
-        player.frame = (player.frame + 1 + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         if get_time() - player.wait_time > 2:
             player.state_machine.handle_event(('TIME_OUT', 0))
 
@@ -109,7 +109,7 @@ class Run:
 
     @staticmethod
     def do(player):
-        player.frame = (player.frame + 1 + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         if player.action < 3:
             player.x += player.dir * RUN_SPEED_PPS * game_framework.frame_time
         else:
@@ -143,11 +143,11 @@ class Jump:
 
     @staticmethod
     def do(player):
-        player.frame = (player.frame + 1) % 13
-        player.y += player.dir * 15
-        if get_time() - player.wait_time > 0.1: #시간으로 속도 조정
-            player.y -= player.dir * 30
-        if get_time() - player.wait_time > 0.2:
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 13
+        player.y += player.dir * RUN_SPEED_PPS * game_framework.frame_time * 3
+        if get_time() - player.wait_time > 0.2: #시간으로 속도 조정
+            player.y -= (player.dir * RUN_SPEED_PPS * game_framework.frame_time) * 6
+        if get_time() - player.wait_time > 0.4:
             player.state_machine.handle_event(('TIME_OUT', 0))
 
     @staticmethod
@@ -170,7 +170,7 @@ class Reception:
 
     @staticmethod
     def do(player):
-        player.frame = (player.frame + 1 + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
 
 
     @staticmethod
@@ -247,7 +247,7 @@ class Player:
         draw_rectangle(*self.get_bb())  # 튜플을 풀어헤쳐서 인자로 전달.
 
     def get_bb(self):
-        return self.x - 20, self.y - 50, self.x + 20, self.y + 50  # 튜플
+        return self.x - 20, self.y - 30, self.x + 20, self.y + 30  # 튜플
 
     def handle_collision(self, group, other):
         pass
