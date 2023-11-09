@@ -1,8 +1,8 @@
 from pico2d import load_image, get_time , delay
 
-class Grass1:
+class Beach:
     def __init__(self):
-        self.image_grass = load_image('beachbkg.png')
+        self.image_grass = load_image('./background/beachbkg.png')
 
     def draw(self):
         self.image_grass.draw(400, 300, 800, 600)
@@ -16,7 +16,7 @@ class Net:
         self.bool = False
         self.frame = 0
         self.x, self.y = 400, 270
-        self.image = load_image('net.png') #270 x450 :6
+        self.image = load_image('./background/net.png') #270 x450 :6
     def update(self):
         if self.bool:
             self.frame = (self.frame + 1) % 6

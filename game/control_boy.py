@@ -1,9 +1,9 @@
 from pico2d import *
 
-from grass import Grass1
-from grass import Net
+from background import Beach
+from background import Net
 
-from boy import Boy
+from player import Boy
 from ball import Boll
 import game_world
 
@@ -26,17 +26,16 @@ def handle_events():
 
 def create_world():
     global running
-    global grass
-    global grass2
+    global beach
     global team
     global boy
     global boll
 
     running = True
 
-    grass = Grass1()
+    beach = Beach()
     net = Net()
-    game_world.add_objects(grass, 0)
+    game_world.add_objects(beach, 0)
     game_world.add_objects(net, 0)
 
     boy = Boy()

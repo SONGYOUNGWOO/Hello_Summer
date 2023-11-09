@@ -212,11 +212,11 @@ class Boy:
         self.action = 2 #1:왼쪽 2:오른쪽 3:위 4:아래 5:점프
         self.dir = 0
         self.face_dir = 1  # 얼굴이 바라보는 방향 1오른쪾 -1왼쪽
-        self.image_idle = load_image('playerIdle.png') # 384 x 43
-        self.image_run = load_image('playerRun.png') # 384 x 43
-        self.image_jump = load_image('playerSmash.png') # 416 x 50
-        self.image_block = load_image('playerBlock.png') # 416 x 46
-        self.image_reception = load_image('playerReception.png') # 352 x 43
+        self.image_idle = load_image('./player/playerIdle.png') # 384 x 43
+        self.image_run = load_image('./player/playerRun.png') # 384 x 43
+        self.image_jump = load_image('./player/playerSmash.png') # 416 x 50
+        self.image_block = load_image('./player/playerBlock.png') # 416 x 46
+        self.image_reception = load_image('./player/playerReception.png') # 352 x 43
         self.state_machine = StateMachine(self)
         self.state_machine.start()
 

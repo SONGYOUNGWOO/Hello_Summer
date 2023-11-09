@@ -7,7 +7,7 @@ class Boll:
 
     def __init__(self):
         if Boll.image == None:
-            Boll.image = load_image('ballRoll.png') # 120x 70
+            Boll.image = load_image('./ball/ballRoll.png') # 120x 70
         self.x, self.y = random.randint(0, 800), 599
         self.frame = 0
 
