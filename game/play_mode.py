@@ -38,8 +38,8 @@ def init():
     player = Player()
     game_world.add_object(player, 1)
 
-    # fill here
     game_world.add_collision_pair('player:net', player, net)
+
     # global balls
     # balls = [Ball(random.randint(0,1600),60,0) for _ in range(50)]
     # game_world.add_objects(balls,1)
