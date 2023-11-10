@@ -40,3 +40,6 @@ class Net:
     def draw(self):
         self.image.clip_composite_draw(int(self.frame) * 45, 0, 45, 450,  - 3.141592 / 100, '', self.x, self.y, 45, 510)
         draw_rectangle(*self.get_bb())
+
+    def handle_collision(self, group, other):
+        pass

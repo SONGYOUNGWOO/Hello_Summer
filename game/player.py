@@ -250,7 +250,8 @@ class Player:
         return self.x - 20, self.y - 30, self.x + 20, self.y + 30  # 튜플
 
     def handle_collision(self, group, other):
-        pass
+        if group == 'player:net' :
+            self.x -= self.dir * RUN_SPEED_PPS * game_framework.frame_time
         # if group == 'boy:ball':  # 아... 볼과 충돌했구나...
         #     self.ball_count += 1
         # if group == 'boy:zombie':
