@@ -1,6 +1,6 @@
 # 이것은 각 상태들을 객체로 구현한 것임.
 from pico2d import (get_time, load_image, SDL_KEYDOWN, SDL_KEYUP, SDLK_SPACE, SDLK_LEFT, SDLK_RIGHT, SDLK_w, SDLK_a,
-                    SDLK_s, SDLK_d, SDLK_k, SDLK_p,SDLK_i,draw_rectangle)
+                    SDLK_s, SDLK_d, SDLK_k, SDLK_p,SDLK_i,SDLK_o,draw_rectangle)
 from ball import Ball
 import game_world
 import game_framework
@@ -40,6 +40,8 @@ def P_down(e): #리시브
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_p
 def I_down(e): #슬라이드
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_i
+def O_down(e): #스매쉬
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_o
 
 def time_out(e):
     return e[0] == 'TIME_OUT'
@@ -47,7 +49,7 @@ def time_out(e):
 
 # Boy Run Speed
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
-RUN_SPEED_KMPH = 20.0  # Km / Hour
+RUN_SPEED_KMPH = 25.0  # Km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
@@ -55,7 +57,7 @@ RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 # Boy Action Speed
 TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-FRAMES_PER_ACTION = 12
+FRAMES_PER_ACTION = 13
 
 
 
@@ -210,6 +212,9 @@ class Slide:# 352 x 43 , 11, 32
         if get_time() - player.wait_time > 0.3:  # 시간으로 속도 조정
             player.state_machine.handle_event(('TIME_OUT', 0))
 
+        player.y = max(0, min(player.y, win_h - win_h / 3.3))
+        player.x = max(10, min(player.x, win_w/2 - 40))
+
     @staticmethod
     def draw(player):
         if player.face_dir == '오른쪽':
@@ -217,6 +222,38 @@ class Slide:# 352 x 43 , 11, 32
         else:
             player.image_slide.clip_composite_draw(int(player.frame) * 43, 0, 43, 43,
                                               0, 'h', player.x , player.y, 64, 65)
+
+class Smash:
+    @staticmethod
+    def enter(player, e):
+        player.dir, player.action = 1, '스매쉬'
+        player.frame = 0
+        global beg
+        beg = player.y
+        player.wait_time = get_time()  # pico2d import 필요
+        pass
+
+    @staticmethod
+    def exit(player, e):
+        pass
+
+    @staticmethod
+    def do(player):
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 13
+        player.y += player.dir * RUN_SPEED_PPS * game_framework.frame_time * 3
+        if get_time() - player.wait_time > 0.3: #시간으로 속도 조정
+            player.y -= (player.dir * RUN_SPEED_PPS * game_framework.frame_time) * 6
+        if get_time() - player.wait_time > 0.6:
+            player.state_machine.handle_event(('TIME_OUT', 0))
+
+
+    @staticmethod
+    def draw(player):
+        if player.face_dir == '오른쪽':
+            player.image_smash.clip_draw(int(player.frame)* 32, 0, 32, 50, player.x, player.y, 48, 75)
+        else:
+            player.image_smash.clip_composite_draw(int(player.frame)* 32, 0, 32, 50,
+                                              0, 'h', player.x , player.y, 48, 75)
 
 
 
@@ -227,15 +264,16 @@ class StateMachine:
         self.transitions = {
             Idle: {D_down: Run, A_down: Run, D_up:  Idle, A_up:  Idle,
                    W_down: Run, S_down: Run, W_up:  Idle, S_up:  Idle,
-                   space_down: Jump, P_down: Reception},
+                   space_down: Jump, P_down: Reception,O_down:Smash},
             Run: {D_down: Idle, A_down: Idle, D_up: Idle, A_up: Idle,
                   W_down: Idle, S_down: Idle, W_up: Idle, S_up: Idle,
-                  space_down: Jump, P_down: Reception, I_down: Slide},
+                  space_down: Jump, P_down: Reception, I_down: Slide,O_down:Smash},
             Jump: {time_out: Idle},
             Reception: {D_down: Run, A_down: Run, D_up:  Idle, A_up:  Idle,
                    W_down: Run, S_down: Run, W_up:  Idle, S_up:  Idle,
-                   space_down: Jump,time_out: Idle},
-            Slide: {time_out: Idle}
+                   space_down: Jump,time_out: Idle ,O_down:Smash},
+            Slide: {time_out: Idle},
+            Smash: {time_out: Idle}
         }
 
     def start(self):
@@ -271,6 +309,7 @@ class Player:
         self.image_block = load_image('./player/playerBlock.png') # 416 x 46
         self.image_reception = load_image('./player/playerReception.png') # 352 x 43 , 11, 32
         self.image_slide = load_image('./player/playerSlide.png') # 645 x 43 , 15, 43
+        self.image_smash = load_image('./player/playerSmash.png') # 416 x 50 , 13, 32
         self.state_machine = StateMachine(self)
         self.state_machine.start()
 

@@ -3,6 +3,9 @@ import game_world
 import game_framework
 import random
 
+global win_w, win_h
+win_w ,win_h = 1000, 700
+
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
 RUN_SPEED_KMPH = 100.0  # Km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
@@ -25,9 +28,12 @@ class Ball:
 
     def update(self):
         self.y += self.velocity * 100 * game_framework.frame_time
+        self.x += self.velocity * 100 * game_framework.frame_time
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
         if self.y > 70:
             self.y -= random.randint(1, 30)
+        self.y = max(10, min(self.y, win_h - 10))
+        self.x = max(10, min(self.x, win_w - 10))
 
     def get_bb(self):
         return self.x - 10, self.y - 10, self.x + 10, self.y + 10
