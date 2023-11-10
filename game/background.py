@@ -1,4 +1,4 @@
-from pico2d import load_image, get_time , delay
+from pico2d import load_image, get_time , delay, draw_rectangle
 import game_framework
 
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
@@ -33,6 +33,10 @@ class Net:
     def update(self):
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 6
 
+    def get_bb(self):
+        return self.x - 20, self.y - 250, self.x + 20, self.y + 250  # 튜플
+
 
     def draw(self):
         self.image.clip_composite_draw(int(self.frame) * 45, 0, 45, 450,  - 3.141592 / 100, '', self.x, self.y, 45, 510)
+        draw_rectangle(*self.get_bb())
