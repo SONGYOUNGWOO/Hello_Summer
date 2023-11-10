@@ -5,6 +5,9 @@ from ball import Ball
 import game_world
 import game_framework
 
+global win_w, win_h
+win_w ,win_h = 1000, 700
+
 # state event check
 # ( state event type, event value )
 def D_down(e): #오른쪽
@@ -51,6 +54,7 @@ RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 12
+
 
 
 
@@ -109,12 +113,15 @@ class Run:
 
     @staticmethod
     def do(player):
+        print(player.y)
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         if player.action == '좌' or player.action == '우':
             player.x += player.dir * RUN_SPEED_PPS * game_framework.frame_time
         else:
             player.y += player.dir * RUN_SPEED_PPS * game_framework.frame_time
-        pass
+
+        player.y = max(0, min(player.y, win_h - win_h/3.3))
+        player.x = max(10, min(player.x, win_w - 10))
 
     @staticmethod
     def draw(player):
@@ -147,6 +154,7 @@ class Jump:
             player.y -= (player.dir * RUN_SPEED_PPS * game_framework.frame_time) * 6
         if get_time() - player.wait_time > 0.4:
             player.state_machine.handle_event(('TIME_OUT', 0))
+
 
     @staticmethod
     def draw(player):
