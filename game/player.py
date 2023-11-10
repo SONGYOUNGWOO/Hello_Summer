@@ -1,6 +1,6 @@
 # 이것은 각 상태들을 객체로 구현한 것임.
 from pico2d import (get_time, load_image, SDL_KEYDOWN, SDL_KEYUP, SDLK_SPACE, SDLK_LEFT, SDLK_RIGHT, SDLK_w, SDLK_a,
-                    SDLK_s, SDLK_d, SDLK_k, SDLK_p,draw_rectangle)
+                    SDLK_s, SDLK_d, SDLK_k, SDLK_p,SDLK_i,draw_rectangle)
 from ball import Ball
 import game_world
 import game_framework
@@ -38,6 +38,8 @@ def K_down(e): #아래
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_k
 def P_down(e): #리시브
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_p
+def I_down(e): #슬라이드
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_i
 
 def time_out(e):
     return e[0] == 'TIME_OUT'
@@ -186,8 +188,36 @@ class Reception:# 352 x 43 , 11, 32
         if player.face_dir == '오른쪽':
             player.image_reception.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
         else:
-            player.image_reception.clip_composite_draw(int(player.frame) * 32, 0, 32, 50,
+            player.image_reception.clip_composite_draw(int(player.frame) * 32, 0, 32, 43,
                                               0, 'h', player.x , player.y, 48, 65)
+
+class Slide:# 352 x 43 , 11, 32
+    @staticmethod
+    def enter(player, e):
+        player.action = '슬라이드'
+        player.frame = 0
+        player.wait_time = get_time()  # pico2d import 필요
+        pass
+
+    @staticmethod
+    def exit(player, e):
+        pass
+
+    @staticmethod
+    def do(player):
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 15
+        player.x += player.dir * RUN_SPEED_PPS * game_framework.frame_time * 2
+        if get_time() - player.wait_time > 0.3:  # 시간으로 속도 조정
+            player.state_machine.handle_event(('TIME_OUT', 0))
+
+    @staticmethod
+    def draw(player):
+        if player.face_dir == '오른쪽':
+            player.image_slide.clip_draw(int(player.frame) * 43, 0, 43, 43, player.x, player.y, 64, 65)
+        else:
+            player.image_slide.clip_composite_draw(int(player.frame) * 43, 0, 43, 43,
+                                              0, 'h', player.x , player.y, 64, 65)
+
 
 
 class StateMachine:
@@ -200,11 +230,12 @@ class StateMachine:
                    space_down: Jump, P_down: Reception},
             Run: {D_down: Idle, A_down: Idle, D_up: Idle, A_up: Idle,
                   W_down: Idle, S_down: Idle, W_up: Idle, S_up: Idle,
-                  space_down: Jump, P_down: Reception},
+                  space_down: Jump, P_down: Reception, I_down: Slide},
             Jump: {time_out: Idle},
             Reception: {D_down: Run, A_down: Run, D_up:  Idle, A_up:  Idle,
                    W_down: Run, S_down: Run, W_up:  Idle, S_up:  Idle,
-                   space_down: Jump, time_out: Idle}
+                   space_down: Jump,time_out: Idle},
+            Slide: {time_out: Idle}
         }
 
     def start(self):
@@ -239,6 +270,7 @@ class Player:
         self.image_jump = load_image('./player/playerSmash.png') # 416 x 50
         self.image_block = load_image('./player/playerBlock.png') # 416 x 46
         self.image_reception = load_image('./player/playerReception.png') # 352 x 43 , 11, 32
+        self.image_slide = load_image('./player/playerSlide.png') # 645 x 43 , 15, 43
         self.state_machine = StateMachine(self)
         self.state_machine.start()
 
