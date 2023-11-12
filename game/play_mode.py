@@ -9,6 +9,7 @@ from background import Net
 from player import Player
 from ball import Ball
 
+
 # boy = None
 
 def handle_events():
@@ -19,12 +20,13 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
         else:
-            player.handle_event(event)
+            for player in players:
+                player.handle_event(event)
 
 
 def init():
     global beach
-    global player
+    global players
     global net
     global ball
 
@@ -36,15 +38,20 @@ def init():
     net = Net()
     game_world.add_object(net, 0)
 
-    player = Player()
-    game_world.add_object(player, 1)
+    players = [Player(20, random.randint(100,300)) for _ in range(2)]
+    for player in players:
+        game_world.add_object(player, 1)
 
     ball = Ball()
-    game_world.add_object(ball,1)
+    game_world.add_object(ball, 1)
 
-    game_world.add_collision_pair('player:net', player, net)
+    game_world.add_collision_pair('player:net', None, net)
+    for player in players:
+        game_world.add_collision_pair('player:net', player, None)
 
-    game_world.add_collision_pair('player:ball',player,ball)
+    game_world.add_collision_pair('player:ball', None, ball)
+    for player in players:
+        game_world.add_collision_pair('player:ball', player, None)
 
     # global balls
     # balls = [Ball(random.randint(0,1600),60,0) for _ in range(50)]
@@ -74,7 +81,6 @@ def update():
     #         game_world.remove_object(ball)  # 볼을 제거
 
 
-
 def draw():
     clear_canvas()
     game_world.render()
@@ -87,4 +93,3 @@ def pause():
 
 def resume():
     pass
-

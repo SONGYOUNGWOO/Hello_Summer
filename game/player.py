@@ -6,42 +6,66 @@ import game_world
 import game_framework
 
 global win_w, win_h
-win_w ,win_h = 1000, 700
+win_w, win_h = 1000, 700
+
 
 # state event check
 # ( state event type, event value )
-def D_down(e): #오른쪽
+def D_down(e):  # 오른쪽
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_d
+
+
 def D_up(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_d
 
-def A_down(e): #왼쪽
+
+def A_down(e):  # 왼쪽
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_a
+
+
 def A_up(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_a
 
-def W_down(e): #위
+
+def W_down(e):  # 위
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_w
-def W_up(e): #위
+
+
+def W_up(e):  # 위
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_w
 
-def S_down(e): #아래
+
+def S_down(e):  # 아래
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_s
-def S_up(e): #아래
+
+
+def S_up(e):  # 아래
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_s
+
 
 def space_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
+
+
 def space_up(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_SPACE
-def K_down(e): #아래
+
+
+def K_down(e):  # 아래
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_k
-def P_down(e): #리시브
+
+
+def P_down(e):  # 리시브
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_p
-def I_down(e): #슬라이드
+
+
+def I_down(e):  # 슬라이드
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_i
-def O_down(e): #스매쉬
+
+
+def O_down(e):  # 스매쉬
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_o
+
 
 def time_out(e):
     return e[0] == 'TIME_OUT'
@@ -58,9 +82,6 @@ RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 13
-
-
-
 
 
 # time_out = lambda e : e[0] == 'TIME_OUT'
@@ -94,7 +115,8 @@ class Idle:
             player.image_idle.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
         else:
             player.image_idle.clip_composite_draw(int(player.frame) * 32, 0, 32, 43,
-                                                   0, 'h', player.x, player.y, 48, 65)
+                                                  0, 'h', player.x, player.y, 48, 65)
+
 
 class Run:
     # 1:왼쪽 2:오른쪽 3:위 4:아래 5:점프
@@ -117,21 +139,21 @@ class Run:
 
     @staticmethod
     def do(player):
-        #print(player.y)
+        # print(player.y)
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         if player.action == '좌' or player.action == '우':
             player.x += player.dir * RUN_SPEED_PPS * game_framework.frame_time
         else:
             player.y += player.dir * RUN_SPEED_PPS * game_framework.frame_time
 
-        player.y = max(0, min(player.y, win_h - win_h/3.3))
-        # player.x = max(10, min(player.x, win_w - 10))
+        player.y = max(0, min(player.y, win_h - win_h / 3.3))
+        player.x = max(10, min(player.x, win_w - 10))
 
     @staticmethod
     def draw(player):
         if player.dir == -1:  # 왼쪽
             player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
-                                              player.x, player.y, 48, 65)
+                                                 player.x, player.y, 48, 65)
         else:
             player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
 
@@ -154,11 +176,10 @@ class Jump:
     def do(player):
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 13
         player.y += player.dir * RUN_SPEED_PPS * game_framework.frame_time * 3
-        if get_time() - player.wait_time > 0.1: #시간으로 속도 조정
+        if get_time() - player.wait_time > 0.2:  # 시간으로 속도 조정
             player.y -= (player.dir * RUN_SPEED_PPS * game_framework.frame_time) * 6
         if get_time() - player.wait_time > 0.4:
             player.state_machine.handle_event(('TIME_OUT', 0))
-
 
     @staticmethod
     def draw(player):
@@ -166,8 +187,10 @@ class Jump:
             player.image_block.clip_draw(32 * 7, 0, 32, 46, player.x, player.y, 48, 65)
         else:
             player.image_block.clip_composite_draw(32 * 7, 0, 32, 46,
-                                              0, 'h', player.x , player.y, 48, 65)
-class Reception:# 352 x 43 , 11, 32
+                                                   0, 'h', player.x, player.y, 48, 65)
+
+
+class Reception:  # 352 x 43 , 11, 32
     @staticmethod
     def enter(player, e):
         player.action = '리시브'
@@ -191,9 +214,10 @@ class Reception:# 352 x 43 , 11, 32
             player.image_reception.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
         else:
             player.image_reception.clip_composite_draw(int(player.frame) * 32, 0, 32, 43,
-                                              0, 'h', player.x , player.y, 48, 65)
+                                                       0, 'h', player.x, player.y, 48, 65)
 
-class Slide:# 352 x 43 , 11, 32
+
+class Slide:  # 352 x 43 , 11, 32
     @staticmethod
     def enter(player, e):
         player.action = '슬라이드'
@@ -213,7 +237,7 @@ class Slide:# 352 x 43 , 11, 32
             player.state_machine.handle_event(('TIME_OUT', 0))
 
         player.y = max(0, min(player.y, win_h - win_h / 3.3))
-        # player.x = max(10, min(player.x, win_w/2 - 40))
+        player.x = max(10, min(player.x, win_w / 2 - 40))
 
     @staticmethod
     def draw(player):
@@ -221,7 +245,8 @@ class Slide:# 352 x 43 , 11, 32
             player.image_slide.clip_draw(int(player.frame) * 43, 0, 43, 43, player.x, player.y, 64, 65)
         else:
             player.image_slide.clip_composite_draw(int(player.frame) * 43, 0, 43, 43,
-                                              0, 'h', player.x , player.y, 64, 65)
+                                                   0, 'h', player.x, player.y, 64, 65)
+
 
 class Smash:
     @staticmethod
@@ -241,20 +266,18 @@ class Smash:
     def do(player):
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 13
         player.y += player.dir * RUN_SPEED_PPS * game_framework.frame_time * 3
-        if get_time() - player.wait_time > 0.3: #시간으로 속도 조정
+        if get_time() - player.wait_time > 0.3:  # 시간으로 속도 조정
             player.y -= (player.dir * RUN_SPEED_PPS * game_framework.frame_time) * 6
         if get_time() - player.wait_time > 0.6:
             player.state_machine.handle_event(('TIME_OUT', 0))
 
-
     @staticmethod
     def draw(player):
         if player.face_dir == '오른쪽':
-            player.image_smash.clip_draw(int(player.frame)* 32, 0, 32, 50, player.x, player.y, 48, 75)
+            player.image_smash.clip_draw(int(player.frame) * 32, 0, 32, 50, player.x, player.y, 48, 75)
         else:
-            player.image_smash.clip_composite_draw(int(player.frame)* 32, 0, 32, 50,
-                                              0, 'h', player.x , player.y, 48, 75)
-
+            player.image_smash.clip_composite_draw(int(player.frame) * 32, 0, 32, 50,
+                                                   0, 'h', player.x, player.y, 48, 75)
 
 
 class StateMachine:
@@ -262,16 +285,16 @@ class StateMachine:
         self.player = player
         self.cur_state = Idle
         self.transitions = {
-            Idle: {D_down: Run, A_down: Run, D_up:  Idle, A_up:  Idle,
-                   W_down: Run, S_down: Run, W_up:  Idle, S_up:  Idle,
-                   space_down: Jump, P_down: Reception,O_down:Smash},
+            Idle: {D_down: Run, A_down: Run, D_up: Idle, A_up: Idle,
+                   W_down: Run, S_down: Run, W_up: Idle, S_up: Idle,
+                   space_down: Jump, P_down: Reception, O_down: Smash},
             Run: {D_down: Idle, A_down: Idle, D_up: Idle, A_up: Idle,
                   W_down: Idle, S_down: Idle, W_up: Idle, S_up: Idle,
-                  space_down: Jump, P_down: Reception, I_down: Slide,O_down:Smash},
+                  space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
             Jump: {time_out: Idle},
-            Reception: {D_down: Run, A_down: Run, D_up:  Idle, A_up:  Idle,
-                   W_down: Run, S_down: Run, W_up:  Idle, S_up:  Idle,
-                   space_down: Jump,time_out: Idle ,O_down:Smash},
+            Reception: {D_down: Run, A_down: Run, D_up: Idle, A_up: Idle,
+                        W_down: Run, S_down: Run, W_up: Idle, S_up: Idle,
+                        space_down: Jump, time_out: Idle, O_down: Smash},
             Slide: {time_out: Idle},
             Smash: {time_out: Idle}
         }
@@ -297,19 +320,19 @@ class StateMachine:
 
 
 class Player:
-    def __init__(self):
-        self.x, self.y = 50, win_h / 2.6
+    def __init__(self, x = 50, y = win_h / 2.6 ):
+        self.x, self.y = x, y
         self.frame = 0
         self.action = '우'
         self.dir = 0
         self.face_dir = '오른쪽'
-        self.image_idle = load_image('./player/playerIdle.png') # 384 x 43
-        self.image_run = load_image('./player/playerRun.png') # 384 x 43
-        self.image_jump = load_image('./player/playerSmash.png') # 416 x 50
-        self.image_block = load_image('./player/playerBlock.png') # 416 x 46
-        self.image_reception = load_image('./player/playerReception.png') # 352 x 43 , 11, 32
-        self.image_slide = load_image('./player/playerSlide.png') # 645 x 43 , 15, 43
-        self.image_smash = load_image('./player/playerSmash.png') # 416 x 50 , 13, 32
+        self.image_idle = load_image('./player/playerIdle.png')  # 384 x 43
+        self.image_run = load_image('./player/playerRun.png')  # 384 x 43
+        self.image_jump = load_image('./player/playerSmash.png')  # 416 x 50
+        self.image_block = load_image('./player/playerBlock.png')  # 416 x 46
+        self.image_reception = load_image('./player/playerReception.png')  # 352 x 43 , 11, 32
+        self.image_slide = load_image('./player/playerSlide.png')  # 645 x 43 , 15, 43
+        self.image_smash = load_image('./player/playerSmash.png')  # 416 x 50 , 13, 32
         self.state_machine = StateMachine(self)
         self.state_machine.start()
 
@@ -331,9 +354,9 @@ class Player:
     def handle_collision(self, group, other):
         if group == 'player:net':
             if other.x > self.x:
-                self.x = clamp(0 ,self.x, other.x - 20)
+                self.x = clamp(0, self.x, other.x - 20)
             else:
-                self.x = clamp( other.x +20, self.x, win_w)
+                self.x = clamp(other.x + 20, self.x, win_w)
             # self.x -= self.dir * RUN_SPEED_PPS * game_framework.frame_time
         # if group == 'boy:ball':  # 아... 볼과 충돌했구나...
         #     self.ball_count += 1
