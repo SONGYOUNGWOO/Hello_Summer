@@ -1,6 +1,6 @@
 # 이것은 각 상태들을 객체로 구현한 것임.
 from pico2d import (get_time, load_image, SDL_KEYDOWN, SDL_KEYUP, SDLK_SPACE, SDLK_LEFT, SDLK_RIGHT, SDLK_w, SDLK_a,
-                    SDLK_s, SDLK_d, SDLK_k, SDLK_p,SDLK_i,SDLK_o,draw_rectangle)
+                    SDLK_s, SDLK_d, SDLK_k, SDLK_p, SDLK_i, SDLK_o, draw_rectangle, clamp)
 from ball import Ball
 import game_world
 import game_framework
@@ -125,7 +125,7 @@ class Run:
             player.y += player.dir * RUN_SPEED_PPS * game_framework.frame_time
 
         player.y = max(0, min(player.y, win_h - win_h/3.3))
-        player.x = max(10, min(player.x, win_w - 10))
+        # player.x = max(10, min(player.x, win_w - 10))
 
     @staticmethod
     def draw(player):
@@ -213,7 +213,7 @@ class Slide:# 352 x 43 , 11, 32
             player.state_machine.handle_event(('TIME_OUT', 0))
 
         player.y = max(0, min(player.y, win_h - win_h / 3.3))
-        player.x = max(10, min(player.x, win_w/2 - 40))
+        # player.x = max(10, min(player.x, win_w/2 - 40))
 
     @staticmethod
     def draw(player):
@@ -330,7 +330,11 @@ class Player:
 
     def handle_collision(self, group, other):
         if group == 'player:net' :
-            self.x -= self.dir * RUN_SPEED_PPS * game_framework.frame_time
+            if other.x > self.x:
+                self.x = clamp(0 ,self.x, other.x - 20)
+            else:
+                self.x = clamp( other.x +20,self.x, win_w)
+            # self.x -= self.dir * RUN_SPEED_PPS * game_framework.frame_time
         # if group == 'boy:ball':  # 아... 볼과 충돌했구나...
         #     self.ball_count += 1
         # if group == 'boy:zombie':
