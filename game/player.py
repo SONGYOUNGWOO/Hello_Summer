@@ -117,7 +117,7 @@ class Run:
 
     @staticmethod
     def do(player):
-        print(player.y)
+        #print(player.y)
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         if player.action == '좌' or player.action == '우':
             player.x += player.dir * RUN_SPEED_PPS * game_framework.frame_time
@@ -154,7 +154,7 @@ class Jump:
     def do(player):
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 13
         player.y += player.dir * RUN_SPEED_PPS * game_framework.frame_time * 3
-        if get_time() - player.wait_time > 0.2: #시간으로 속도 조정
+        if get_time() - player.wait_time > 0.1: #시간으로 속도 조정
             player.y -= (player.dir * RUN_SPEED_PPS * game_framework.frame_time) * 6
         if get_time() - player.wait_time > 0.4:
             player.state_machine.handle_event(('TIME_OUT', 0))
@@ -298,7 +298,7 @@ class StateMachine:
 
 class Player:
     def __init__(self):
-        self.x, self.y = 100, 40
+        self.x, self.y = 50, win_h / 2.6
         self.frame = 0
         self.action = '우'
         self.dir = 0
@@ -329,11 +329,11 @@ class Player:
         return self.x - 20, self.y - 30, self.x + 20, self.y + 30  # 튜플
 
     def handle_collision(self, group, other):
-        if group == 'player:net' :
+        if group == 'player:net':
             if other.x > self.x:
                 self.x = clamp(0 ,self.x, other.x - 20)
             else:
-                self.x = clamp( other.x +20,self.x, win_w)
+                self.x = clamp( other.x +20, self.x, win_w)
             # self.x -= self.dir * RUN_SPEED_PPS * game_framework.frame_time
         # if group == 'boy:ball':  # 아... 볼과 충돌했구나...
         #     self.ball_count += 1
