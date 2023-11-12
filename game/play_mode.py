@@ -13,15 +13,20 @@ from ball import Ball
 # boy = None
 
 def handle_events():
+    global player_slect
+    
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_u:
+            player_slect = 1
         else:
-            for player in players:
-                player.handle_event(event)
+            # for player in players:
+            #     player.handle_event(event)
+            players[player_slect].handle_event(event)
 
 
 def init():
@@ -29,9 +34,10 @@ def init():
     global players
     global net
     global ball
+    global player_slect
 
     running = True
-
+    player_slect = 0
     beach = Beach()
     game_world.add_object(beach, 0)
 
