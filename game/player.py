@@ -1,6 +1,6 @@
 # 이것은 각 상태들을 객체로 구현한 것임.
 from pico2d import (get_time, load_image, SDL_KEYDOWN, SDL_KEYUP, SDLK_SPACE, SDLK_LEFT, SDLK_RIGHT, SDLK_w, SDLK_a,
-                    SDLK_s, SDLK_d, SDLK_k, SDLK_p, SDLK_i, SDLK_o, draw_rectangle, clamp)
+                    SDLK_s, SDLK_d, SDLK_k, SDLK_p, SDLK_i, SDLK_o,SDLK_m, draw_rectangle, clamp)
 from ball import Ball
 import game_world
 import game_framework
@@ -66,7 +66,8 @@ def I_down(e):  # 슬라이드
 def O_down(e):  # 스매쉬
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_o
 
-
+def M_down(e): #bb on off
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_m
 def time_out(e):
     return e[0] == 'TIME_OUT'
 

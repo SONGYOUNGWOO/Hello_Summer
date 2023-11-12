@@ -32,21 +32,35 @@ class Ball:
         self.hit = False
 
     def update(self):
-        # print(get_time(),self.wait_time)
-        if (self.hit):
-            if (get_time() - self.ball_hit_time < 2):
+        if self.hit:
+            # Handle hit condition
+            if get_time() - self.ball_hit_time < 0.6:
                 self.dx, self.dy = 1, 1
                 self.y += self.dy * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
                 self.x += self.dx * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
-                self.wait_time = get_time()
+            if get_time() - self.ball_hit_time >= 0.6 and get_time() - self.ball_hit_time < 1.1 :  # 시간으로 속도 조정
+                self.dx, self.dy = 1, 1
+                self.x += self.dx * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
+                self.y -= self.dy * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
+            else:
+                # Stop moving after 2 seconds
+                self.dx, self.dy = 0, 0
         else:
-            if (get_time() - self.wait_time < 1):
+            # Handle non-hit condition
+            if get_time() - self.wait_time < 1:
+                # Move up for 1 second
+                self.dx, self.dy = 0, 1
+                self.y += self.dy * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
+            else:
+                # Move down after 1 second
                 self.dx, self.dy = 0, -1
                 self.y += self.dy * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
 
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
         self.y = max(10, min(self.y, win_h - 10))
         self.x = max(10, min(self.x, win_w - 10))
+
+
 
     def get_bb(self):
         return self.x - 12, self.y - 25, self.x + 12, self.y + 8
@@ -56,7 +70,7 @@ class Ball:
         draw_rectangle(*self.get_bb())
 
     def handle_collision(self, group, other):
-        if group == 'ball:ball':
+        if group == 'player:ball':
             self.ball_hit_time = get_time()
             self.velocity = 2
             self.hit = True
