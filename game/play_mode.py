@@ -22,7 +22,8 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_u:
-            player_slect = 1
+            player_slect = 0 if player_slect else 1
+
         else:
             # for player in players:
             #     player.handle_event(event)
