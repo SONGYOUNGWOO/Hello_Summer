@@ -26,6 +26,7 @@ def init():
     global beach
     global player
     global net
+    global ball
 
     running = True
 
@@ -37,6 +38,9 @@ def init():
 
     player = Player()
     game_world.add_object(player, 1)
+
+    ball = Ball()
+    game_world.add_object(ball,1)
 
     game_world.add_collision_pair('player:net', player, net)
 
