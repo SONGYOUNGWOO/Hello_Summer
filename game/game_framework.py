@@ -1,4 +1,5 @@
 import time
+from pico2d import delay
 
 
 def change_mode(mode):
