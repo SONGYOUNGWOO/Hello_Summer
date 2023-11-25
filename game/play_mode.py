@@ -21,13 +21,12 @@ def handle_events():
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
+
         elif event.type == SDL_KEYDOWN and event.key == SDLK_u:
-            player_slect = 0 if player_slect else 1
+            player_slect = players[0] if player_slect == players[1] else players[1]
 
         else:
-            # for player in players:
-            #     player.handle_event(event)
-            players[player_slect].handle_event(event)
+            player_slect.handle_event(event)
 
 
 def init():
@@ -38,7 +37,7 @@ def init():
     global player_slect
 
     running = True
-    player_slect = 0
+
     beach = Beach()
     game_world.add_object(beach, 0)
 
@@ -48,6 +47,7 @@ def init():
     players = [Player(20, random.randint(100,300)) for _ in range(2)]
     for player in players:
         game_world.add_object(player, 1)
+    player_slect = players[0]
 
     ball = Ball()
     game_world.add_object(ball, 1)

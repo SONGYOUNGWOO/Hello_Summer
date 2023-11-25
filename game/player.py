@@ -4,65 +4,52 @@ from pico2d import (get_time, load_image, SDL_KEYDOWN, SDL_KEYUP, SDLK_SPACE, SD
 from ball import Ball
 import game_world
 import game_framework
-
+import play_mode
+import random
+import math
+from behavior_tree import BehaviorTree, Action, Sequence, Condition, Selector
 
 global win_w, win_h
 win_w, win_h = 1000, 700
-
 
 # state event check
 # ( state event type, event value )
 def D_down(e):  # 오른쪽
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_d
 
-
 def D_up(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_d
-
 
 def A_down(e):  # 왼쪽
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_a
 
-
 def A_up(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_a
-
 
 def W_down(e):  # 위
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_w
 
-
 def W_up(e):  # 위
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_w
-
 
 def S_down(e):  # 아래
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_s
 
-
 def S_up(e):  # 아래
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_s
-
-
 def space_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
 
-
 def space_up(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_SPACE
-
-
 def K_down(e):  # 아래
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_k
-
 
 def P_down(e):  # 리시브
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_p
 
-
 def I_down(e):  # 슬라이드
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_i
-
 
 def O_down(e):  # 스매쉬
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_o
@@ -118,12 +105,10 @@ class Idle:
     @staticmethod
     def draw(player):
         if player.face_dir == '오른쪽':
-            player.image_idle.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+            Player.image_idle.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
         else:
-            player.image_idle.clip_composite_draw(int(player.frame) * 32, 0, 32, 43,
+            Player.image_idle.clip_composite_draw(int(player.frame) * 32, 0, 32, 43,
                                                   0, 'h', player.x, player.y, 48, 65)
-
-
 class RunRight:
     @staticmethod
     def enter(player, e):
@@ -143,8 +128,7 @@ class RunRight:
 
     @staticmethod
     def draw(player):
-        player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
-
+        Player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
 
 class RunRightUp:
     @staticmethod
@@ -166,7 +150,7 @@ class RunRightUp:
 
     @staticmethod
     def draw(player):
-        player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        Player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
 
 class RunRightDown:
     @staticmethod
@@ -188,10 +172,7 @@ class RunRightDown:
 
     @staticmethod
     def draw(player):
-        player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
-
-
-
+        Player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
 
 class RunLeft:
     @staticmethod
@@ -212,9 +193,8 @@ class RunLeft:
 
     @staticmethod
     def draw(player):
-        player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
+        Player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
                                              player.x, player.y, 48, 65)
-
 
 class RunLeftUp:
     @staticmethod
@@ -236,9 +216,8 @@ class RunLeftUp:
 
     @staticmethod
     def draw(player):
-        player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
+        Player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
                                              player.x, player.y, 48, 65)
-
 
 class RunLeftDown:
     @staticmethod
@@ -261,11 +240,8 @@ class RunLeftDown:
 
     @staticmethod
     def draw(player):
-        player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
+        Player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
                                              player.x, player.y, 48, 65)
-
-
-
 
 class RunUp:
     @staticmethod
@@ -288,8 +264,7 @@ class RunUp:
 
     @staticmethod
     def draw(player):
-        player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
-
+        Player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
 
 class RunDown:
     @staticmethod
@@ -311,9 +286,7 @@ class RunDown:
 
     @staticmethod
     def draw(player):
-        player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
-
-
+        Player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
 
 class Jump:
     @staticmethod
@@ -341,11 +314,10 @@ class Jump:
     @staticmethod
     def draw(player):
         if player.face_dir == '오른쪽':
-            player.image_block.clip_draw(32 * 7, 0, 32, 46, player.x, player.y, 48, 65)
+            Player.image_block.clip_draw(32 * 7, 0, 32, 46, player.x, player.y, 48, 65)
         else:
-            player.image_block.clip_composite_draw(32 * 7, 0, 32, 46,
+            Player.image_block.clip_composite_draw(32 * 7, 0, 32, 46,
                                                    0, 'h', player.x, player.y, 48, 65)
-
 
 class Reception:  # 352 x 43 , 11, 32
     @staticmethod
@@ -368,11 +340,10 @@ class Reception:  # 352 x 43 , 11, 32
     @staticmethod
     def draw(player):
         if player.face_dir == '오른쪽':
-            player.image_reception.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+            Player.image_reception.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
         else:
-            player.image_reception.clip_composite_draw(int(player.frame) * 32, 0, 32, 43,
+            Player.image_reception.clip_composite_draw(int(player.frame) * 32, 0, 32, 43,
                                                        0, 'h', player.x, player.y, 48, 65)
-
 
 class Slide:  # 352 x 43 , 11, 32
     @staticmethod
@@ -399,11 +370,10 @@ class Slide:  # 352 x 43 , 11, 32
     @staticmethod
     def draw(player):
         if player.face_dir == '오른쪽':
-            player.image_slide.clip_draw(int(player.frame) * 43, 0, 43, 43, player.x, player.y, 64, 65)
+            Player.image_slide.clip_draw(int(player.frame) * 43, 0, 43, 43, player.x, player.y, 64, 65)
         else:
-            player.image_slide.clip_composite_draw(int(player.frame) * 43, 0, 43, 43,
+            Player.image_slide.clip_composite_draw(int(player.frame) * 43, 0, 43, 43,
                                                    0, 'h', player.x, player.y, 64, 65)
-
 
 class Smash:
     @staticmethod
@@ -431,9 +401,9 @@ class Smash:
     @staticmethod
     def draw(player):
         if player.face_dir == '오른쪽':
-            player.image_smash.clip_draw(int(player.frame) * 32, 0, 32, 50, player.x, player.y, 48, 75)
+            Player.image_smash.clip_draw(int(player.frame) * 32, 0, 32, 50, player.x, player.y, 48, 75)
         else:
-            player.image_smash.clip_composite_draw(int(player.frame) * 32, 0, 32, 50,
+            Player.image_smash.clip_composite_draw(int(player.frame) * 32, 0, 32, 50,
                                                    0, 'h', player.x, player.y, 48, 75)
 
 
@@ -443,32 +413,32 @@ class StateMachine:
         self.cur_state = Idle
         self.transitions = {
             Idle: {D_down: RunRight, A_down: RunLeft, A_up: RunRight, D_up: RunLeft, W_down: RunUp,
-                   S_down: RunDown, W_up: RunDown, S_up: RunUp, U_down: Idle,
+                   S_down: RunDown, W_up: RunDown, S_up: RunUp,
                    space_down: Jump, P_down: Reception, O_down: Smash},
             RunRight: {D_up: Idle, A_down: Idle, W_down: RunRightUp, W_up: RunRightDown,
-                       S_down: RunRightDown, S_up: RunRightUp,space_down: Jump, U_down: Idle,
+                       S_down: RunRightDown, S_up: RunRightUp,space_down: Jump,
                        P_down: Reception, I_down: Slide, O_down: Smash},
-            RunRightUp: {W_up: RunRight, D_up: RunUp, A_down: RunUp, S_down: RunRight, U_down: Idle,
+            RunRightUp: {W_up: RunRight, D_up: RunUp, A_down: RunUp, S_down: RunRight,
                          space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
-            RunUp: {W_up: Idle, A_down: RunLeftUp, S_down: Idle, D_down: RunRightUp, U_down: Idle,
+            RunUp: {W_up: Idle, A_down: RunLeftUp, S_down: Idle, D_down: RunRightUp,
                     A_up: RunRightUp, D_up: RunLeftUp, space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
-            RunLeftUp: {D_down: RunUp, S_down: RunLeft, A_up: RunUp, W_up: RunLeft, U_down: Idle,
+            RunLeftUp: {D_down: RunUp, S_down: RunLeft, A_up: RunUp, W_up: RunLeft,
                         space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
             RunLeft: {A_up: Idle, W_down: RunLeftUp, D_down: Idle, S_down: RunLeftDown,
-                      W_up: RunLeftDown, S_up: RunLeftUp, U_down: Idle,
+                      W_up: RunLeftDown, S_up: RunLeftUp,
                       space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
-            RunLeftDown: {A_up: RunDown, S_up: RunLeft, W_down: RunLeft, D_down: RunDown, U_down: Idle,
+            RunLeftDown: {A_up: RunDown, S_up: RunLeft, W_down: RunLeft, D_down: RunDown,
                           space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
-            RunDown: {S_up: Idle, A_down: RunLeftDown, W_down: Idle, D_down: RunRightDown, U_down: Idle,
+            RunDown: {S_up: Idle, A_down: RunLeftDown, W_down: Idle, D_down: RunRightDown,
                       A_up: RunRightDown, D_up: RunLeftDown,space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
-            RunRightDown: {D_up: RunDown, S_up: RunRight, A_down: RunDown, W_down: RunRight, U_down: Idle,
-                           space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
-            Jump: {time_out: Idle, U_down: Idle},
-            Reception: {D_down: RunRight, A_down: RunLeft, D_up: Idle, A_up: Idle, U_down: Idle,
+            RunRightDown: {D_up: RunDown, S_up: RunRight, A_down: RunDown, W_down: RunRight
+                           ,space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
+            Jump: {time_out: Idle},
+            Reception: {D_down: RunRight, A_down: RunLeft, D_up: Idle, A_up: Idle,
                         W_down: RunUp, S_down: RunDown, W_up: Idle, S_up: Idle,
                         space_down: Jump, time_out: Idle, O_down: Smash},
-            Slide: {time_out: Idle,  U_down: Idle},
-            Smash: {time_out: Idle, U_down: Idle}
+            Slide: {time_out: Idle},
+            Smash: {time_out: Idle}
         }
 
     def start(self):
@@ -478,7 +448,6 @@ class StateMachine:
         self.cur_state.do(self.player)
 
     def handle_event(self, e):
-
 
         for check_event, next_state in self.transitions[self.cur_state].items():
             if check_event(e):
@@ -494,24 +463,49 @@ class StateMachine:
 
 
 class Player:
+    image_idle = None
+    image_run = None
+    image_jump = None
+    image_block = None
+    image_reception = None
+    image_slide = None
+    image_smash = None
+
     def __init__(self, x = 50, y = win_h / 2.6 ):
         self.x, self.y = x, y
         self.frame = 0
         self.action = '우'
         self.dir = 0
         self.face_dir = '오른쪽'
-        self.image_idle = load_image('./player/playerIdle.png')  # 384 x 43
-        self.image_run = load_image('./player/playerRun.png')  # 384 x 43
-        self.image_jump = load_image('./player/playerSmash.png')  # 416 x 50
-        self.image_block = load_image('./player/playerBlock.png')  # 416 x 46
-        self.image_reception = load_image('./player/playerReception.png')  # 352 x 43 , 11, 32
-        self.image_slide = load_image('./player/playerSlide.png')  # 645 x 43 , 15, 43
-        self.image_smash = load_image('./player/playerSmash.png')  # 416 x 50 , 13, 32
         self.state_machine = StateMachine(self)
         self.state_machine.start()
 
+        self.tx, self.ty = 100, 100
+        self.difp = None
+        # self.build_behavior_tree()
+
+
+        if Player.image_idle == None:
+            Player.image_idle = load_image('./player/playerIdle.png')  # 384 x 43
+        if Player.image_run == None:
+            Player.image_run = load_image('./player/playerRun.png')  # 384 x 43
+        if Player.image_jump == None:
+            Player.image_jump = load_image('./player/playerSmash.png')  # 416 x 50
+        if Player.image_block == None:
+            Player.image_block = load_image('./player/playerBlock.png')  # 416 x 46
+        if Player.image_reception == None:
+            Player.image_reception = load_image('./player/playerReception.png')  # 352 x 43 , 11, 32
+        if Player.image_slide == None:
+            Player.image_slide = load_image('./player/playerSlide.png')  # 645 x 43 , 15, 43
+        if Player.image_smash == None:
+            Player.image_smash = load_image('./player/playerSmash.png')  # 416 x 50 , 13, 32
+
+
+
     def update(self):
         self.state_machine.update()
+        if play_mode.player_slect != self:
+            self.bt.run()
 
     def handle_event(self, event):
         self.state_machine.handle_event(('INPUT', event))
@@ -545,4 +539,109 @@ class Player:
         # if self.face_dir == '왼쪾':
         #     print('FIRE BALL to LEFT')
         # elif self.face_dir == '오른쪽':
-        #     print('FIRE BALL to RIGHT')
+        #     print('FIRE BALL to RIGHT'
+
+    def set_target_location(self, x=None, y=None):
+        if not x or not y :
+            raise ValueError('위치를 지정을 해야 합니다.')
+        self.tx, self.ty = x, y
+        return BehaviorTree.SUCCESS
+        pass
+
+    def distance_less_than(self, x1, y1, x2, y2, r):
+        distance2 = (x1 - x2)**2 + (y1 - y2)**2
+        return distance2 < (r * PIXEL_PER_METER) ** 2
+        pass
+
+    # dir = radian
+    def move_slightly_to(self, tx, ty):
+        self.dir = math.atan2(ty - self.y, tx - self.x)
+        self.speed = RUN_SPEED_PPS
+        self.x += self.speed * math.cos(self.dir) * game_framework.frame_time
+        self.y += self.speed * math.sin(self.dir) * game_framework.frame_time
+
+    #조금씩 움직이면서 기준 안쪽으로 들어오면
+    def move_to(self, r=0.5):
+        self.state = 'Walk'
+        self.move_slightly_to(self.tx, self.ty)
+        if self.distance_less_than(self.tx, self.ty, self.x, self.y, r):
+            return BehaviorTree.SUCCESS
+        else:
+            return BehaviorTree.RUNNING
+
+
+    def set_random_location(self):
+        self.tx, self.ty = random.randint(100,1000-100), random.randint(100, 800-100)
+        pass
+
+    def is_boy_nearby(self, r):
+        if self.distance_less_than(play_mode.boy.x, play_mode.boy.y, self.x, self.y, r):
+            return BehaviorTree.SUCCESS
+        else:
+            return BehaviorTree.FAIL
+        pass
+
+    def move_to_boy(self, r=0.5):
+        self.state = 'Walk'
+        self.move_slightly_to(play_mode.boy.x, play_mode.boy.y)
+        if self.distance_less_than(play_mode.boy.x, play_mode.boy.y, self.x, self.y, r):
+            return BehaviorTree.SUCCESS
+        else:
+            return BehaviorTree.RUNNING
+
+    def run_away_to_boy(self, r=0.5):
+        self.state = 'Walk'
+
+        # 소년과 좀비 사이의 (방향)을 계산
+        dx = self.x - play_mode.boy.x
+        dy = self.y - play_mode.boy.y
+
+        # 도망칠 위치 설정 (현재 좀비 위치에서 소년과의 차이만큼 더 이동)
+        escape_x = self.x + dx
+        escape_y = self.y + dy
+
+        # 도망칠 위치로 이동
+        self.move_slightly_to(escape_x, escape_y)
+
+        # 소년과의 거리가 충분히 멀어졌는지 체크
+        if self.distance_less_than(play_mode.boy.x, play_mode.boy.y, self.x, self.y, r) > 7:
+            return BehaviorTree.SUCCESS
+        else:
+            return BehaviorTree.RUNNING
+
+
+    def get_patrol_location(self):
+        self.tx, self.ty = self.patrol_locations[self.loc_no]
+        self.loc_no = (self.loc_no + 1) % len(self.patrol_locations)
+        return BehaviorTree.SUCCESS
+        pass
+
+    def is_player_substitution(self):
+        if play_mode.player_slect != self:
+            return BehaviorTree.SUCCESS
+        else:
+            return BehaviorTree.FAIL
+
+    def move_relatively(self):
+        self.sp_w, self.sp_h = win_w/4, win_w/4
+        if self.difp == None :
+            for player in play_mode.players:
+                if player != self:
+                    self.difp = player
+
+
+
+
+
+
+
+
+
+
+    def build_behavior_tree(self):
+        c1 = Condition('교체 되었는가?', self.is_player_substitution)
+        a1 = Action('팀원과 적절한 거리로 이동', self.move_relatively)
+
+        root = SEQ_chase_boy = Sequence('소년을 추적', c1, a1)
+
+        self.bt = BehaviorTree(root)
