@@ -1,9 +1,10 @@
 # 이것은 각 상태들을 객체로 구현한 것임.
 from pico2d import (get_time, load_image, SDL_KEYDOWN, SDL_KEYUP, SDLK_SPACE, SDLK_LEFT, SDLK_RIGHT, SDLK_w, SDLK_a,
-                    SDLK_s, SDLK_d, SDLK_k, SDLK_p, SDLK_i, SDLK_o,SDLK_m, draw_rectangle, clamp)
+                    SDLK_s, SDLK_d, SDLK_k, SDLK_p, SDLK_i, SDLK_o,SDLK_m, SDLK_u, draw_rectangle, clamp)
 from ball import Ball
 import game_world
 import game_framework
+
 
 global win_w, win_h
 win_w, win_h = 1000, 700
@@ -68,18 +69,22 @@ def O_down(e):  # 스매쉬
 
 def M_down(e): #bb on off
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_m
+
+def U_down(e):  # 캐릭터 선택
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_u
+
 def time_out(e):
     return e[0] == 'TIME_OUT'
 
 
-# Boy Run Speed
+# player Run Speed
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
 RUN_SPEED_KMPH = 25.0  # Km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
-# Boy Action Speed
+# player Action Speed
 TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 13
@@ -119,44 +124,195 @@ class Idle:
                                                   0, 'h', player.x, player.y, 48, 65)
 
 
-class Run:
-    # 1:왼쪽 2:오른쪽 3:위 4:아래 5:점프
+class RunRight:
     @staticmethod
     def enter(player, e):
-        if A_down(e) or A_up(e):
-            player.dir, player.face_dir, player.action = -1, '왼쪽', '좌'
-        elif D_down(e) or D_up(e):
-            player.dir, player.face_dir, player.action = 1, '오른쪽', '우'
-        elif W_down(e) or W_up(e):
-            player.dir, player.face_dir, player.action = 1, '오른쪽', '위'
-        elif S_down(e) or S_up(e):
-            player.dir, player.face_dir, player.action = -1, '오른쪽', '아래'
+        pass
 
     @staticmethod
     def exit(player, e):
-        if P_down(e):
-            player.fire_ball()
         pass
 
     @staticmethod
     def do(player):
-        # print(player.y)
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
-        if player.action == '좌' or player.action == '우':
-            player.x += player.dir * RUN_SPEED_PPS * game_framework.frame_time
-        else:
-            player.y += player.dir * RUN_SPEED_PPS * game_framework.frame_time
-
-        player.y = max(0, min(player.y, win_h - win_h / 3.3))
-        player.x = max(10, min(player.x, win_w - 10))
+        player.x += RUN_SPEED_PPS * game_framework.frame_time
+        player.x = clamp(10, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+        pass
 
     @staticmethod
     def draw(player):
-        if player.dir == -1:  # 왼쪽
-            player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
-                                                 player.x, player.y, 48, 65)
-        else:
-            player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+
+
+class RunRightUp:
+    @staticmethod
+    def enter(player, e):
+        pass
+
+    @staticmethod
+    def exit(player, e):
+        pass
+
+    @staticmethod
+    def do(player):
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
+        player.x += RUN_SPEED_PPS * game_framework.frame_time * 0.8
+        player.y += RUN_SPEED_PPS * game_framework.frame_time * 0.8
+        player.x = clamp(10, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+        pass
+
+    @staticmethod
+    def draw(player):
+        player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+
+class RunRightDown:
+    @staticmethod
+    def enter(player, e):
+        pass
+
+    @staticmethod
+    def exit(player, e):
+        pass
+
+    @staticmethod
+    def do(player):
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
+        player.x += RUN_SPEED_PPS * game_framework.frame_time * 0.8
+        player.y -= RUN_SPEED_PPS * game_framework.frame_time * 0.8
+        player.x = clamp(10, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+        pass
+
+    @staticmethod
+    def draw(player):
+        player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+
+
+
+
+class RunLeft:
+    @staticmethod
+    def enter(player, e):
+        pass
+
+    @staticmethod
+    def exit(player, e):
+        pass
+
+    @staticmethod
+    def do(player):
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
+        player.x -= RUN_SPEED_PPS * game_framework.frame_time
+        player.x = clamp(10, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+        pass
+
+    @staticmethod
+    def draw(player):
+        player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
+                                             player.x, player.y, 48, 65)
+
+
+class RunLeftUp:
+    @staticmethod
+    def enter(player, e):
+        pass
+
+    @staticmethod
+    def exit(player, e):
+        pass
+
+    @staticmethod
+    def do(player):
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
+        player.x -= RUN_SPEED_PPS * game_framework.frame_time * 0.8
+        player.y += RUN_SPEED_PPS * game_framework.frame_time * 0.8
+        player.x = clamp(10, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+
+
+    @staticmethod
+    def draw(player):
+        player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
+                                             player.x, player.y, 48, 65)
+
+
+class RunLeftDown:
+    @staticmethod
+    def enter(player, e):
+        pass
+
+    @staticmethod
+    def exit(player, e):
+        pass
+
+    @staticmethod
+    def do(player):
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
+        player.x -= RUN_SPEED_PPS * game_framework.frame_time * 0.8
+        player.y -= RUN_SPEED_PPS * game_framework.frame_time * 0.8
+
+        player.x = clamp(10, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+
+
+    @staticmethod
+    def draw(player):
+        player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
+                                             player.x, player.y, 48, 65)
+
+
+
+
+class RunUp:
+    @staticmethod
+    def enter(player, e):
+        pass
+
+
+    @staticmethod
+    def exit(player, e):
+        pass
+
+    @staticmethod
+    def do(player):
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
+        player.y += RUN_SPEED_PPS * game_framework.frame_time
+
+        player.x = clamp(10, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+        pass
+
+    @staticmethod
+    def draw(player):
+        player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+
+
+class RunDown:
+    @staticmethod
+    def enter(player, e):
+        pass
+
+    @staticmethod
+    def exit(player, e):
+        pass
+
+    @staticmethod
+    def do(player):
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
+        player.y -= RUN_SPEED_PPS * game_framework.frame_time
+
+        player.x = clamp(10, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+        pass
+
+    @staticmethod
+    def draw(player):
+        player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+
 
 
 class Jump:
@@ -286,18 +442,33 @@ class StateMachine:
         self.player = player
         self.cur_state = Idle
         self.transitions = {
-            Idle: {D_down: Run, A_down: Run, D_up: Idle, A_up: Idle,
-                   W_down: Run, S_down: Run, W_up: Idle, S_up: Idle,
+            Idle: {D_down: RunRight, A_down: RunLeft, A_up: RunRight, D_up: RunLeft, W_down: RunUp,
+                   S_down: RunDown, W_up: RunDown, S_up: RunUp, U_down: Idle,
                    space_down: Jump, P_down: Reception, O_down: Smash},
-            Run: {D_down: Idle, A_down: Idle, D_up: Idle, A_up: Idle,
-                  W_down: Idle, S_down: Idle, W_up: Idle, S_up: Idle,
-                  space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
-            Jump: {time_out: Idle},
-            Reception: {D_down: Run, A_down: Run, D_up: Idle, A_up: Idle,
-                        W_down: Run, S_down: Run, W_up: Idle, S_up: Idle,
+            RunRight: {D_up: Idle, A_down: Idle, W_down: RunRightUp, W_up: RunRightDown,
+                       S_down: RunRightDown, S_up: RunRightUp,space_down: Jump, U_down: Idle,
+                       P_down: Reception, I_down: Slide, O_down: Smash},
+            RunRightUp: {W_up: RunRight, D_up: RunUp, A_down: RunUp, S_down: RunRight, U_down: Idle,
+                         space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
+            RunUp: {W_up: Idle, A_down: RunLeftUp, S_down: Idle, D_down: RunRightUp, U_down: Idle,
+                    A_up: RunRightUp, D_up: RunLeftUp, space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
+            RunLeftUp: {D_down: RunUp, S_down: RunLeft, A_up: RunUp, W_up: RunLeft, U_down: Idle,
+                        space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
+            RunLeft: {A_up: Idle, W_down: RunLeftUp, D_down: Idle, S_down: RunLeftDown,
+                      W_up: RunLeftDown, S_up: RunLeftUp, U_down: Idle,
+                      space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
+            RunLeftDown: {A_up: RunDown, S_up: RunLeft, W_down: RunLeft, D_down: RunDown, U_down: Idle,
+                          space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
+            RunDown: {S_up: Idle, A_down: RunLeftDown, W_down: Idle, D_down: RunRightDown, U_down: Idle,
+                      A_up: RunRightDown, D_up: RunLeftDown,space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
+            RunRightDown: {D_up: RunDown, S_up: RunRight, A_down: RunDown, W_down: RunRight, U_down: Idle,
+                           space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
+            Jump: {time_out: Idle, U_down: Idle},
+            Reception: {D_down: RunRight, A_down: RunLeft, D_up: Idle, A_up: Idle, U_down: Idle,
+                        W_down: RunUp, S_down: RunDown, W_up: Idle, S_up: Idle,
                         space_down: Jump, time_out: Idle, O_down: Smash},
-            Slide: {time_out: Idle},
-            Smash: {time_out: Idle}
+            Slide: {time_out: Idle,  U_down: Idle},
+            Smash: {time_out: Idle, U_down: Idle}
         }
 
     def start(self):
@@ -307,6 +478,8 @@ class StateMachine:
         self.cur_state.do(self.player)
 
     def handle_event(self, e):
+
+
         for check_event, next_state in self.transitions[self.cur_state].items():
             if check_event(e):
                 self.cur_state.exit(self.player, e)
@@ -359,9 +532,9 @@ class Player:
             else:
                 self.x = clamp(other.x + 20, self.x, win_w)
             # self.x -= self.dir * RUN_SPEED_PPS * game_framework.frame_time
-        # if group == 'boy:ball':  # 아... 볼과 충돌했구나...
+        # if group == 'player:ball':  # 아... 볼과 충돌했구나...
         #     self.ball_count += 1
-        # if group == 'boy:zombie':
+        # if group == 'player:zombie':
         #     exit(1)
 
     def fire_ball(self):
