@@ -411,6 +411,8 @@ class StateMachine:
     def __init__(self, player):
         self.player = player
         self.cur_state = Idle
+        self.state_duration = 3
+
         self.transitions = {
             Idle: {D_down: RunRight, A_down: RunLeft, A_up: RunRight, D_up: RunLeft, W_down: RunUp,
                    S_down: RunDown, W_up: RunDown, S_up: RunUp,
@@ -448,13 +450,15 @@ class StateMachine:
         self.cur_state.do(self.player)
 
         if self.player in play_mode.enemy_team:
-            if get_time() - self.last_state_change > random.randint(2, 5):
-                self.change_state_randomly()
+            if get_time() - self.last_state_change > self.state_duration:
+                self.change_state()
                 self.last_state_change = get_time()
 
-    def change_state_randomly(self):
-        # 무작위 이동 상태 선택
-        next_state = random.choice([RunUp, RunDown])
+    def change_state(self):
+        if self.cur_state == RunUp:
+            next_state = RunDown
+        else:
+            next_state = RunUp
         self.cur_state.exit(self.player, None)
         self.cur_state = next_state
         self.cur_state.enter(self.player, None)

@@ -45,7 +45,7 @@ def init():
     net = Net()
     game_world.add_object(net, 0)
 
-    players = [Player(random.randint(20, win_w/2 - 20), random.randint(100,300)) for _ in range(2)]
+    players = [Player(win_w/2- 80,  win_h/2 ), Player(80, 100)]
     for player in players:
         game_world.add_object(player, 1)
     player_slect = players[0]
