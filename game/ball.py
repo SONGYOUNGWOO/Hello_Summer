@@ -45,9 +45,10 @@ class Ball:
             if self.mode == '스매쉬':
                 self.dx = 1 if play_mode.players else -1
                 self.velocity = 3
-            else:
-                self.dx = 1 if play_mode.players else -1
-                self.velocity = 3
+            elif self.mode == '리시브':
+                self.dx = 0
+                self.dy *= -1
+
         else:
             pass
 
@@ -71,6 +72,8 @@ class Ball:
         if group == 'player:ball':
             if other.action == '스매쉬':
                 self.mode = '스매쉬'
+            elif other.action == '슬라디드' or other.action == '리시브':
+                self.mode = '리시브'
             self.ball_hit_time = get_time()
             self.velocity = 2
             self.hit = True

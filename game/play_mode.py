@@ -11,10 +11,14 @@ from ball import Ball
 
 win_w ,win_h = 1000, 700
 # boy = None
+def switch_to_next_character():
+    global player_slect
+    current_index = players.index(player_slect)
+    next_index = (current_index + 1) % len(players)
+    player_slect = players[next_index]
 
 def handle_events():
-    global player_slect
-    
+
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -23,7 +27,7 @@ def handle_events():
             game_framework.quit()
 
         elif event.type == SDL_KEYDOWN and event.key == SDLK_u:
-            player_slect = players[0] if player_slect == players[1] else players[1]
+            switch_to_next_character()
 
         else:
             player_slect.handle_event(event)

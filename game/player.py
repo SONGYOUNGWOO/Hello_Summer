@@ -369,7 +369,7 @@ class RunDown:
 class Jump:
     @staticmethod
     def enter(player, e):
-        player.shadow_y = player.y - 35
+        player.shadow_y = player.y -35
         player.action = '점프'
         if player.face_dir == '오른쪽' :
             player.dir = 1
@@ -470,9 +470,9 @@ class Slide:  # 352 x 43 , 11, 32
 class Smash:
     @staticmethod
     def enter(player, e):
-        player.shadow_y = player.y - 35
+        player.shadow_y = player.y -35
         player.action = '스매쉬'
-        if player.face_dir == '오른쪽' :
+        if player.face_dir == '오른쪽':
             player.dir = 1
         else :
             player.dir = -1
@@ -514,26 +514,28 @@ class StateMachine:
         self.transitions = {
             Idle: {D_down: RunRight, A_down: RunLeft, A_up: RunRight, D_up: RunLeft, W_down: RunUp,
                    S_down: RunDown, W_up: RunDown, S_up: RunUp,
-                   space_down: Jump, P_down: Reception, O_down: Smash},
+                   space_down: Jump, P_down: Reception, O_down: Smash,U_down: self.player.change_character },
             RunRight: {D_up: Idle, A_down: Idle, W_down: RunRightUp, W_up: RunRightDown,
                        S_down: RunRightDown, S_up: RunRightUp,space_down: Jump,
-                       P_down: Reception, I_down: Slide, O_down: Smash},
+                       P_down: Reception, I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
             RunRightUp: {W_up: RunRight, D_up: RunUp, A_down: RunUp, S_down: RunRight,
-                         space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
+                         space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
             RunUp: {W_up: Idle, A_down: RunLeftUp, S_down: Idle, D_down: RunRightUp,
-                    A_up: RunRightUp, D_up: RunLeftUp, space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
+                    A_up: RunRightUp, D_up: RunLeftUp, space_down: Jump, P_down: Reception,
+                    I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
             RunLeftUp: {D_down: RunUp, S_down: RunLeft, A_up: RunUp, W_up: RunLeft,
-                        space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
+                        space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
             RunLeft: {A_up: Idle, W_down: RunLeftUp, D_down: Idle, S_down: RunLeftDown,
                       W_up: RunLeftDown, S_up: RunLeftUp,
-                      space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
+                      space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
             RunLeftDown: {A_up: RunDown, S_up: RunLeft, W_down: RunLeft, D_down: RunDown,
-                          space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
+                          space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
             RunDown: {S_up: Idle, A_down: RunLeftDown, W_down: Idle, D_down: RunRightDown,
-                      A_up: RunRightDown, D_up: RunLeftDown,space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
+                      A_up: RunRightDown, D_up: RunLeftDown,space_down: Jump,
+                      P_down: Reception, I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
             RunRightDown: {D_up: RunDown, S_up: RunRight, A_down: RunDown, W_down: RunRight
-                           ,space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash},
-            Jump: {time_out: Idle},
+                           ,space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash,U_down:self.player.change_character},
+            Jump: {time_out: Idle },
             Reception: {D_down: RunRight, A_down: RunLeft, D_up: Idle, A_up: Idle,
                         W_down: RunUp, S_down: RunDown, W_up: Idle, S_up: Idle,
                         space_down: Jump, time_out: Idle, O_down: Smash},
@@ -673,6 +675,15 @@ class Player:
         #     self.ball_count += 1
         # if group == 'player:zombie':
         #     exit(1)
+
+    def change_character(self):
+        # 현재 캐릭터를 Idle 상태로 설정
+        self.state_machine.cur_state.exit(self, None)
+        self.state_machine.cur_state = Idle
+        self.state_machine.cur_state.enter(self, None)
+
+        # 다음 캐릭터로 변경
+        play_mode.switch_to_next_character()
 
 
     def set_target_location(self, x=None, y=None):
