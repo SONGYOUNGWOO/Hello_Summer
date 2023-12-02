@@ -50,7 +50,7 @@ def init():
         game_world.add_object(player, 1)
     player_slect = players[0]
 
-    enemy_team = [Player(random.randint(win_w/2 + 20, win_w - 20), random.randint(100, 300)) for _ in range(2)]
+    enemy_team = [Player(win_w/2 + 50, win_h/2), Player(win_w - 80, 100)]
     for player in enemy_team:
         player.face_dir = '왼쪽'  # 모든 적 팀 플레이어를 왼쪽을 바라보도록 설정
         game_world.add_object(player, 1)

@@ -454,8 +454,7 @@ class StateMachine:
 
     def change_state_randomly(self):
         # 무작위 이동 상태 선택
-        next_state = random.choice([Idle,RunRight,RunRightUp, RunUp,RunLeftUp,
-                                    RunLeft, RunLeftDown, RunDown, RunRightDown])
+        next_state = random.choice([RunUp, RunDown])
         self.cur_state.exit(self.player, None)
         self.cur_state = next_state
         self.cur_state.enter(self.player, None)
@@ -524,6 +523,7 @@ class Player:
     def update(self):
         if self in play_mode.enemy_team:
             self.state_machine.update()
+            self.x = clamp(win_w / 2 + 10, self.x, win_w - 10)
         else:
             # 일반 플레이어 업데이트 로직
             self.state_machine.update()
