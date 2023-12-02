@@ -4,7 +4,7 @@ import play_mode
 # import title_mode
 
 global win_w, win_h
-win_w, win_h = 1000, 700
+win_w, win_h = 1000, 600
 
 def init():
     global image

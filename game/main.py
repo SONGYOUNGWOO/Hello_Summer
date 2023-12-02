@@ -5,7 +5,7 @@ import play_mode
 
 global win_w, win_h
 
-win_w ,win_h = 1000, 700
+win_w ,win_h = 1000, 600
 
 open_canvas(win_w, win_h, sync=False)
 game_framework.run(start_mode)

@@ -10,7 +10,7 @@ import math
 from behavior_tree import BehaviorTree, Action, Sequence, Condition, Selector
 
 global win_w, win_h
-win_w, win_h = 1000, 700
+win_w, win_h = 1000, 600
 
 # state event check
 # ( state event type, event value )
@@ -598,7 +598,7 @@ class Player:
     image_reception = None
     image_slide = None
     image_smash = None
-    image_shadow0 = None
+    image_shadow1 = None
 
 
     def __init__(self, x = 50, y = win_h / 2.6 , initial_state_name="Idle"):
@@ -631,8 +631,8 @@ class Player:
             Player.image_slide = load_image('./player/playerSlide.png')  # 645 x 43 , 15, 43
         if Player.image_smash == None:
             Player.image_smash = load_image('./player/playerSmash.png')  # 416 x 50 , 13, 32
-        if Player.image_shadow0 == None:
-            Player.image_shadow0 = load_image('./player/shadow0.png')  # 23 x 10
+        if Player.image_shadow1 == None:
+            Player.image_shadow1 = load_image('./player/shadow1.png')  # 23 x 10
 
 
 
@@ -656,7 +656,7 @@ class Player:
     def draw(self):
         self.state_machine.draw()
         if self.state_machine.cur_state == Jump or self.state_machine.cur_state == Smash:
-            self.image_shadow0.clip_draw(0,0,23,10,self.x,  self.shadow_y ,22,10)  # 그림자의 위치를 플레이어 아래로 조정
+            self.image_shadow1.clip_draw(0,0,23,10,self.x,  self.shadow_y ,22,10)  # 그림자의 위치를 플레이어 아래로 조정
         # self.font.draw(self.x - 10, self.y + 50, f'{self.ball_count:02d}', (255, 255, 0))
         # # 디버그용 바운딩박스 그리기
         draw_rectangle(*self.get_bb())  # 튜플을 풀어헤쳐서 인자로 전달.

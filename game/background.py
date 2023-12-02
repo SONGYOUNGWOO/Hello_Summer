@@ -20,7 +20,7 @@ FRAMES_PER_ACTION = 6
 # 700-490,600-430, 500-360 약 3.3
 class Beach:
     def __init__(self):
-        self.image_grass = load_image('./background/beachbkg.png')
+        self.image_grass = load_image('./background/beachbkg2.png')
 
     def draw(self):
         self.image_grass.draw(win_w / 2, win_h / 2, win_w, win_h)
@@ -33,8 +33,8 @@ class Net:
     def __init__(self):
         self.bool = False
         self.frame = 0
-        self.x, self.y = win_w / 2, win_h / 2.2
-        self.image = load_image('./background/net.png')  # 270 x450 :6
+        self.x, self.y = win_w / 2, 180
+        self.image = load_image('./background/net3.png')  # 270, 375
 
     def update(self):
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 6
@@ -43,8 +43,8 @@ class Net:
         return self.x - 20, self.y - win_h / 2.4, self.x + 20, self.y + win_h / 2.4  # 튜플
 
     def draw(self):
-        self.image.clip_composite_draw(int(self.frame) * 45, 0, 45, 450, - 3.141592 / 100, '', self.x, self.y, 45,
-                                       win_h - 100)
+        self.image.clip_composite_draw(int(self.frame) * 45, 0, 45, 375, - 3.141592 / 100, '', self.x, self.y, 45,
+                                       win_h/2)
         #draw_rectangle(*self.get_bb())
 
     def handle_collision(self, group, other):

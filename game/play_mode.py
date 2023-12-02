@@ -9,7 +9,7 @@ from background import Net
 from player import Player
 from ball import Ball
 
-win_w ,win_h = 1000, 700
+win_w ,win_h = 1000, 600
 # boy = None
 def switch_to_next_character():
     global player_slect
