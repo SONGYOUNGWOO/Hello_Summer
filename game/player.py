@@ -129,8 +129,8 @@ class RunRight:
     def do(player):
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         player.x += RUN_SPEED_PPS * game_framework.frame_time
-        player.x = clamp(10, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+        player.x = clamp(20, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h / 3)
         pass
 
     @staticmethod
@@ -160,8 +160,8 @@ class RunRightUp:
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         player.x += RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.y += RUN_SPEED_PPS * game_framework.frame_time * 0.8
-        player.x = clamp(10, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+        player.x = clamp(20, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h / 3)
         pass
 
     @staticmethod
@@ -192,8 +192,8 @@ class RunRightDown:
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         player.x += RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.y -= RUN_SPEED_PPS * game_framework.frame_time * 0.8
-        player.x = clamp(10, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+        player.x = clamp(20, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h / 3)
         pass
 
     @staticmethod
@@ -223,8 +223,8 @@ class RunLeft:
     def do(player):
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         player.x -= RUN_SPEED_PPS * game_framework.frame_time
-        player.x = clamp(10, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+        player.x = clamp(20, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h / 3)
         pass
 
     @staticmethod
@@ -255,8 +255,8 @@ class RunLeftUp:
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         player.x -= RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.y += RUN_SPEED_PPS * game_framework.frame_time * 0.8
-        player.x = clamp(10, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+        player.x = clamp(20, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h / 3)
 
 
     @staticmethod
@@ -289,8 +289,8 @@ class RunLeftDown:
         player.x -= RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.y -= RUN_SPEED_PPS * game_framework.frame_time * 0.8
 
-        player.x = clamp(10, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+        player.x = clamp(20, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h / 3)
 
 
     @staticmethod
@@ -323,8 +323,8 @@ class RunUp:
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         player.y += RUN_SPEED_PPS * game_framework.frame_time
 
-        player.x = clamp(10, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+        player.x = clamp(20, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h /3)
         pass
 
     @staticmethod
@@ -354,8 +354,8 @@ class RunDown:
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         player.y -= RUN_SPEED_PPS * game_framework.frame_time
 
-        player.x = clamp(10, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h / 3.3)
+        player.x = clamp(20, player.x, win_w - 10)
+        player.y = clamp(25, player.y, win_h - win_h / 3)
         pass
 
     @staticmethod
@@ -640,7 +640,7 @@ class Player:
         if self in play_mode.enemy_team:
             self.state_machine.update()
             self.x = clamp(win_w / 2 + 10, self.x, win_w - 10)
-            self.y = clamp(50, self.y, win_h/2 + 50)
+            self.y = clamp(50, self.y, win_h/3)
         else:
             # 일반 플레이어 업데이트 로직
             self.state_machine.update()
