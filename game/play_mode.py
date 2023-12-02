@@ -9,7 +9,7 @@ from background import Net
 from player import Player
 from ball import Ball
 
-
+win_w ,win_h = 1000, 700
 # boy = None
 
 def handle_events():
@@ -32,6 +32,7 @@ def handle_events():
 def init():
     global beach
     global players
+    global enemy_team
     global net
     global ball
     global player_slect
@@ -44,10 +45,15 @@ def init():
     net = Net()
     game_world.add_object(net, 0)
 
-    players = [Player(20, random.randint(100,300)) for _ in range(2)]
+    players = [Player(random.randint(20, win_w/2 - 20), random.randint(100,300)) for _ in range(2)]
     for player in players:
         game_world.add_object(player, 1)
     player_slect = players[0]
+
+    enemy_team = [Player(random.randint(win_w/2 + 20, win_w - 20), random.randint(100, 300)) for _ in range(2)]
+    for player in enemy_team:
+        player.face_dir = '왼쪽'  # 모든 적 팀 플레이어를 왼쪽을 바라보도록 설정
+        game_world.add_object(player, 1)
 
     ball = Ball()
     game_world.add_object(ball, 1)

@@ -2,6 +2,7 @@ from pico2d import load_image, draw_rectangle, get_time, clamp
 import game_world
 import game_framework
 import random
+import play_mode
 
 global win_w, win_h
 win_w, win_h = 1000, 700
@@ -20,6 +21,7 @@ FRAMES_PER_ACTION = 8
 
 class Ball:
     image = None
+    GRAVITY = -5
 
     def __init__(self, x=30, y=win_h - 100, velocity=1):  # 초기값
         if Ball.image == None:
@@ -30,35 +32,53 @@ class Ball:
         self.x, self.y, self.velocity, self.frame = x, y, velocity, 0
         self.dx, self.dy = 0, -1
         self.hit = False
+        self.mode = 'idle'
 
     def update(self):
-        if self.hit:
-            # Handle hit condition
-            if get_time() - self.ball_hit_time < 0.6:
-                self.dx, self.dy = 1, 1
-                self.y += self.dy * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
-                self.x += self.dx * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
-            if get_time() - self.ball_hit_time >= 0.6 and get_time() - self.ball_hit_time < 1.1 :  # 시간으로 속도 조정
-                self.dx, self.dy = 1, 1
-                self.x += self.dx * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
-                self.y -= self.dy * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
-            else:
-                # Stop moving after 2 seconds
-                self.dx, self.dy = 0, 0
-        else:
-            # Handle non-hit condition
-            if get_time() - self.wait_time < 1:
-                # Move up for 1 second
-                self.dx, self.dy = 0, 1
-                self.y += self.dy * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
-            else:
-                # Move down after 1 second
-                self.dx, self.dy = 0, -1
-                self.y += self.dy * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
+        # 최대 속도와 감속 값 설정
+        MAX_VELOCITY = 2
+        DECELERATION = 0.2
 
+        # 중력에 의한 가속
+        self.velocity += self.GRAVITY * game_framework.frame_time
+        self.velocity = clamp(-MAX_VELOCITY, self.velocity, MAX_VELOCITY)
+
+        # 공의 움직임 처리
+        if self.hit:
+            if self.mode == '스매쉬':
+                self.dx = 1
+                self.dy = -1
+                self.y = play_mode.player_slect.y + 30
+                self.velocity = 3
+
+
+
+            # 히트된 상태일 때의 움직임 처리
+            elif self.velocity > MAX_VELOCITY:
+                self.velocity -= DECELERATION * game_framework.frame_time
+        else:
+            # 히트되지 않은 상태일 때의 움직임 처리
+            if get_time() - self.wait_time < 1:
+                self.dy = 1  # 위로 이동
+            else:
+                self.dy = -1  # 아래로 이동
+
+        if self.y <= 11:
+            self.hit = False
+            self.dy = 0
+            self.dx = 0
+            self.velocity = 0
+
+        # 속도 적용
+        self.x += self.dx * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
+        self.y += self.dy * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
+
+        # 프레임 및 위치 제한
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
-        self.y = max(10, min(self.y, win_h - 10))
-        self.x = max(10, min(self.x, win_w - 10))
+        self.y = clamp(10, self.y, win_h - 10)
+        self.x = clamp(10, self.x, win_w - 10)
+
+
 
 
 
@@ -71,6 +91,8 @@ class Ball:
 
     def handle_collision(self, group, other):
         if group == 'player:ball':
+            if other.action == '스매쉬':
+                self.mode = '스매쉬'
             self.ball_hit_time = get_time()
             self.velocity = 2
             self.hit = True

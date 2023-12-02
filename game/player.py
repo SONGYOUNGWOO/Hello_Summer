@@ -92,8 +92,6 @@ class Idle:
 
     @staticmethod
     def exit(player, e):
-        if P_down(e):
-            player.fire_ball()
         pass
 
     @staticmethod
@@ -383,10 +381,12 @@ class Smash:
         global beg
         beg = player.y
         player.wait_time = get_time()  # pico2d import 필요
-        pass
+
+
 
     @staticmethod
     def exit(player, e):
+        play_mode.ball_mode = 'smash'
         pass
 
     @staticmethod
@@ -477,6 +477,7 @@ class Player:
         self.action = '우'
         self.dir = 0
         self.face_dir = '오른쪽'
+        self.current_state = None  # 현재 상태를 저장하는 변수
         self.state_machine = StateMachine(self)
         self.state_machine.start()
 
@@ -504,8 +505,8 @@ class Player:
 
     def update(self):
         self.state_machine.update()
-        if play_mode.player_slect != self:
-            self.bt.run()
+        # if play_mode.player_slect != self:
+        #     self.bt.run()
 
     def handle_event(self, event):
         self.state_machine.handle_event(('INPUT', event))
@@ -531,15 +532,6 @@ class Player:
         # if group == 'player:zombie':
         #     exit(1)
 
-    def fire_ball(self):
-        pass
-        # ball = Ball(self.x, self.y + 5, self.face_dir * 10)
-        # game_world.add_objects(ball, 0)
-        #
-        # if self.face_dir == '왼쪾':
-        #     print('FIRE BALL to LEFT')
-        # elif self.face_dir == '오른쪽':
-        #     print('FIRE BALL to RIGHT'
 
     def set_target_location(self, x=None, y=None):
         if not x or not y :
@@ -622,6 +614,13 @@ class Player:
         else:
             return BehaviorTree.FAIL
 
+    def is_ball_ground(self):
+        if play_mode.ball.y == 10:
+            return BehaviorTree.SUCCESS
+        else:
+            return BehaviorTree.FAIL
+
+
     def move_relatively(self):
         self.sp_w, self.sp_h = win_w/4, win_w/4
         if self.difp == None :
@@ -629,19 +628,60 @@ class Player:
                 if player != self:
                     self.difp = player
 
+    def next_round(self):
+        return BehaviorTree.SUCCESS
 
+    def close_to_the_ball(self):
+        p1x, p1y =  play_mode.player[0].x,  play_mode.player[0].y
+        p2x, p2y =  play_mode.player[1].x,  play_mode.player[1].y
+        ball_x, ball_y = play_mode.ball.x, play_mode.ball.y
 
+        distance_to_p1 = math.sqrt((ball_x - p1x) ** 2 + (ball_y - p1y) ** 2)
+        distance_to_p2 = math.sqrt((ball_x - p2x) ** 2 + (ball_y - p2y) ** 2)
 
+        if distance_to_p1 < distance_to_p2:
+            return play_mode.player[0]
+        elif distance_to_p2 < distance_to_p1:
+            return play_mode.player[1]
+        else: #거리가 같음
+            return play_mode.player[0]
 
+    def is_ball_net_over(self):
+        if play_mode.ball.x > win_w/2: #우측 라인
+            return BehaviorTree.SUCCESS
 
+    def jump_spike(self):
+        # 벽에 가장 가까운 플레이어 찾기
+        closest_player = min(play_mode.player, key=lambda p: p.x)
+
+        # 이 플레이어의 StateMachine 상태를 Smash로 설정
+        closest_player.state_machine.cur_state = Smash
+        closest_player.state_machine.cur_state.enter(closest_player, ('NONE', 0))
+
+        # 공의 위치와 방향 설정
+        play_mode.ball.x = closest_player.x
+        play_mode.ball.y = closest_player.y + 50  # 플레이어의 높이 위로 설정
+
+        # 공을 상대 진형으로 넘기기 위한 속도 및 방향 설정
+        # 예시: 공에 대한 속도와 방향 벡터 설정
+        play_mode.ball.velocity_x = 300  # X축 속도
+        play_mode.ball.velocity_y = 400  # Y축 속도 (양의 값이면 위로, 음의 값이면 아래로)
+
+        # 스매쉬 동작에 필요한 추가 애니메이션 또는 상태 변화 로직
+        # 예: 애니메이션 프레임 설정, 특정 시간 후 상태 변경 등
+    def do_serve(self):
+        pass
 
 
 
 
     def build_behavior_tree(self):
-        c1 = Condition('교체 되었는가?', self.is_player_substitution)
-        a1 = Action('팀원과 적절한 거리로 이동', self.move_relatively)
+        c1 = Condition('공이 땅에 닿았는가?', self.is_ball_ground)
+        a1 = Action('다음 라운드', self.next_round)
 
-        root = SEQ_chase_boy = Sequence('소년을 추적', c1, a1)
+        SEQ_next_round = Sequence('다음라운드 ', c1, a1)
 
-        self.bt = BehaviorTree(root)
+        c2 = Condition('서브인가?', self.is_ball_net_over)
+        SEQ_ATTACK = Sequence('공격',)
+
+        # self.bt = BehaviorTree(root)
