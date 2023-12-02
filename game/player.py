@@ -126,7 +126,11 @@ class RunRight:
 
     @staticmethod
     def draw(player):
-        Player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        if player.face_dir == '오른쪽':
+            Player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        else:
+            Player.image_run.clip_composite_draw(int(player.frame) * 32,0, 32, 43, 0, 'h', player.x, player.y, 48, 65)
+
 
 class RunRightUp:
     @staticmethod
@@ -148,7 +152,12 @@ class RunRightUp:
 
     @staticmethod
     def draw(player):
-        Player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        if player.face_dir == '오른쪽':
+            Player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        else:
+            Player.image_run.clip_composite_draw(int(player.frame) * 32,0, 32, 43, 0, 'h', player.x, player.y, 48, 65)
+
+
 
 class RunRightDown:
     @staticmethod
@@ -170,7 +179,12 @@ class RunRightDown:
 
     @staticmethod
     def draw(player):
-        Player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        if player.face_dir == '오른쪽':
+            Player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        else:
+            Player.image_run.clip_composite_draw(int(player.frame) * 32,0, 32, 43, 0, 'h', player.x, player.y, 48, 65)
+
+
 
 class RunLeft:
     @staticmethod
@@ -191,8 +205,12 @@ class RunLeft:
 
     @staticmethod
     def draw(player):
-        Player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
-                                             player.x, player.y, 48, 65)
+        if player.face_dir == '오른쪽':
+            Player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
+                                                 player.x, player.y, 48, 65)
+        else:
+            Player.image_run.clip_composite_draw(int(player.frame) * 32,0, 32, 43, player.x, player.y, 48, 65)
+
 
 class RunLeftUp:
     @staticmethod
@@ -214,8 +232,13 @@ class RunLeftUp:
 
     @staticmethod
     def draw(player):
-        Player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
-                                             player.x, player.y, 48, 65)
+        if player.face_dir == '오른쪽':
+            Player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
+                                                 player.x, player.y, 48, 65)
+        else:
+            Player.image_run.clip_composite_draw(int(player.frame) * 32,0, 32, 43, player.x, player.y, 48, 65)
+
+
 
 class RunLeftDown:
     @staticmethod
@@ -238,8 +261,13 @@ class RunLeftDown:
 
     @staticmethod
     def draw(player):
-        Player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
-                                             player.x, player.y, 48, 65)
+        if player.face_dir == '오른쪽':
+            Player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
+                                                 player.x, player.y, 48, 65)
+        else:
+            Player.image_run.clip_composite_draw(int(player.frame) * 32,0, 32, 43, player.x, player.y, 48, 65)
+
+
 
 class RunUp:
     @staticmethod
@@ -262,7 +290,12 @@ class RunUp:
 
     @staticmethod
     def draw(player):
-        Player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        if player.face_dir == '오른쪽':
+            Player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        else:
+            Player.image_run.clip_composite_draw(int(player.frame) * 32,0, 32, 43,
+                                                   0, 'h', player.x, player.y, 48, 65)
+
 
 class RunDown:
     @staticmethod
@@ -284,7 +317,11 @@ class RunDown:
 
     @staticmethod
     def draw(player):
-        Player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        if player.face_dir == '오른쪽':
+            Player.image_run.clip_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        else:
+            Player.image_run.clip_composite_draw(int(player.frame) * 32,0, 32, 43,
+                                                   0, 'h', player.x, player.y, 48, 65)
 
 class Jump:
     @staticmethod
@@ -411,7 +448,7 @@ class StateMachine:
     def __init__(self, player):
         self.player = player
         self.cur_state = Idle
-        self.state_duration = 3
+        self.state_duration = 2
 
         self.transitions = {
             Idle: {D_down: RunRight, A_down: RunLeft, A_up: RunRight, D_up: RunLeft, W_down: RunUp,
@@ -443,8 +480,11 @@ class StateMachine:
             Smash: {time_out: Idle}
         }
 
-    def start(self):
+    def start(self, initial_state_name="Idle"):
+        initial_state = self.get_state_by_name(initial_state_name)
+        self.cur_state = initial_state
         self.cur_state.enter(self.player, ('NONE', 0))
+        self.last_state_change = get_time()
 
     def update(self):
         self.cur_state.do(self.player)
@@ -453,6 +493,14 @@ class StateMachine:
             if get_time() - self.last_state_change > self.state_duration:
                 self.change_state()
                 self.last_state_change = get_time()
+
+    def get_state_by_name(self, state_name):
+        return {
+            "Idle": Idle,
+            "RunUp": RunUp,
+            "RunDown": RunDown,
+            # 기타 상태 이름과 클래스 매핑...
+        }.get(state_name, Idle)
 
     def change_state(self):
         if self.cur_state == RunUp:
@@ -489,7 +537,7 @@ class Player:
     image_smash = None
 
 
-    def __init__(self, x = 50, y = win_h / 2.6 ):
+    def __init__(self, x = 50, y = win_h / 2.6 , initial_state_name="Idle"):
         self.x, self.y = x, y
         self.frame = 0
         self.action = '우'
@@ -497,8 +545,7 @@ class Player:
         self.face_dir = '오른쪽'
         self.current_state = None  # 현재 상태를 저장하는 변수
         self.state_machine = StateMachine(self)
-        self.state_machine.start()
-        self.state_en_machine = StateMachine(self)
+        self.state_machine.start(initial_state_name)
         self.state_machine.last_state_change = get_time()  # 마지막 상태 변경 시간 초기화
 
 
@@ -528,6 +575,7 @@ class Player:
         if self in play_mode.enemy_team:
             self.state_machine.update()
             self.x = clamp(win_w / 2 + 10, self.x, win_w - 10)
+            self.y = clamp(50, self.y, win_h/2 + 50)
         else:
             # 일반 플레이어 업데이트 로직
             self.state_machine.update()
