@@ -447,6 +447,20 @@ class StateMachine:
     def update(self):
         self.cur_state.do(self.player)
 
+        if self.player in play_mode.enemy_team:
+            if get_time() - self.last_state_change > random.randint(2, 5):
+                self.change_state_randomly()
+                self.last_state_change = get_time()
+
+    def change_state_randomly(self):
+        # 무작위 이동 상태 선택
+        next_state = random.choice([Idle,RunRight,RunRightUp, RunUp,RunLeftUp,
+                                    RunLeft, RunLeftDown, RunDown, RunRightDown])
+        self.cur_state.exit(self.player, None)
+        self.cur_state = next_state
+        self.cur_state.enter(self.player, None)
+
+
     def handle_event(self, e):
 
         for check_event, next_state in self.transitions[self.cur_state].items():
@@ -471,6 +485,7 @@ class Player:
     image_slide = None
     image_smash = None
 
+
     def __init__(self, x = 50, y = win_h / 2.6 ):
         self.x, self.y = x, y
         self.frame = 0
@@ -480,6 +495,9 @@ class Player:
         self.current_state = None  # 현재 상태를 저장하는 변수
         self.state_machine = StateMachine(self)
         self.state_machine.start()
+        self.state_en_machine = StateMachine(self)
+        self.state_machine.last_state_change = get_time()  # 마지막 상태 변경 시간 초기화
+
 
         self.tx, self.ty = 100, 100
         self.difp = None
@@ -504,7 +522,11 @@ class Player:
 
 
     def update(self):
-        self.state_machine.update()
+        if self in play_mode.enemy_team:
+            self.state_machine.update()
+        else:
+            # 일반 플레이어 업데이트 로직
+            self.state_machine.update()
         # if play_mode.player_slect != self:
         #     self.bt.run()
 
