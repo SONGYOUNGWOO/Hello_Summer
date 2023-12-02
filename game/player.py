@@ -81,10 +81,14 @@ FRAMES_PER_ACTION = 13
 class Idle:
     @staticmethod
     def enter(player, e):
+
         if player.face_dir == '왼쪽':
             player.action = '좌'
+            player.dir = -1
         elif player.face_dir == '오른쪽':
             player.action = '우'
+            player.dir = 1
+
         player.dir = 0
         player.frame = 0
         player.wait_time = get_time()  # pico2d import 필요
@@ -110,6 +114,11 @@ class Idle:
 class RunRight:
     @staticmethod
     def enter(player, e):
+
+        if player.face_dir == '오른쪽' :
+            player.dir = 1
+        else :
+            player.dir = -1
         pass
 
     @staticmethod
@@ -135,6 +144,11 @@ class RunRight:
 class RunRightUp:
     @staticmethod
     def enter(player, e):
+
+        if player.face_dir == '오른쪽' :
+            player.dir = 1
+        else :
+            player.dir = -1
         pass
 
     @staticmethod
@@ -162,6 +176,11 @@ class RunRightUp:
 class RunRightDown:
     @staticmethod
     def enter(player, e):
+
+        if player.face_dir == '오른쪽' :
+            player.dir = 1
+        else :
+            player.dir = -1
         pass
 
     @staticmethod
@@ -189,6 +208,11 @@ class RunRightDown:
 class RunLeft:
     @staticmethod
     def enter(player, e):
+
+        if player.face_dir == '오른쪽' :
+            player.dir = 1
+        else :
+            player.dir = -1
         pass
 
     @staticmethod
@@ -215,6 +239,11 @@ class RunLeft:
 class RunLeftUp:
     @staticmethod
     def enter(player, e):
+
+        if player.face_dir == '오른쪽' :
+            player.dir = 1
+        else :
+            player.dir = -1
         pass
 
     @staticmethod
@@ -243,6 +272,11 @@ class RunLeftUp:
 class RunLeftDown:
     @staticmethod
     def enter(player, e):
+
+        if player.face_dir == '오른쪽' :
+            player.dir = 1
+        else :
+            player.dir = -1
         pass
 
     @staticmethod
@@ -272,6 +306,11 @@ class RunLeftDown:
 class RunUp:
     @staticmethod
     def enter(player, e):
+
+        if player.face_dir == '오른쪽' :
+            player.dir = 1
+        else :
+            player.dir = -1
         pass
 
 
@@ -300,6 +339,10 @@ class RunUp:
 class RunDown:
     @staticmethod
     def enter(player, e):
+        if player.face_dir == '오른쪽' :
+            player.dir = 1
+        else :
+            player.dir = -1
         pass
 
     @staticmethod
@@ -326,10 +369,14 @@ class RunDown:
 class Jump:
     @staticmethod
     def enter(player, e):
-        player.dir, player.action = 1, '점프'
+        player.shadow_y = player.y - 35
+        player.action = '점프'
+        if player.face_dir == '오른쪽' :
+            player.dir = 1
+        else :
+            player.dir = -1
         player.frame = 0
-        global beg
-        beg = player.y
+
         player.wait_time = get_time()  # pico2d import 필요
         pass
 
@@ -360,6 +407,11 @@ class Reception:  # 352 x 43 , 11, 32
         player.action = '리시브'
         player.frame = 0
         player.wait_time = get_time()  # pico2d import 필요
+
+        if player.face_dir == '오른쪽' :
+            player.dir = 1
+        else :
+            player.dir = -1
         pass
 
     @staticmethod
@@ -386,6 +438,11 @@ class Slide:  # 352 x 43 , 11, 32
         player.action = '슬라이드'
         player.frame = 0
         player.wait_time = get_time()  # pico2d import 필요
+
+        if player.face_dir == '오른쪽' :
+            player.dir = 1
+        else :
+            player.dir = -1
         pass
 
     @staticmethod
@@ -413,10 +470,14 @@ class Slide:  # 352 x 43 , 11, 32
 class Smash:
     @staticmethod
     def enter(player, e):
-        player.dir, player.action = 1, '스매쉬'
+        player.shadow_y = player.y - 35
+        player.action = '스매쉬'
+        if player.face_dir == '오른쪽' :
+            player.dir = 1
+        else :
+            player.dir = -1
         player.frame = 0
-        global beg
-        beg = player.y
+
         player.wait_time = get_time()  # pico2d import 필요
 
 
@@ -535,6 +596,7 @@ class Player:
     image_reception = None
     image_slide = None
     image_smash = None
+    image_shadow0 = None
 
 
     def __init__(self, x = 50, y = win_h / 2.6 , initial_state_name="Idle"):
@@ -547,12 +609,11 @@ class Player:
         self.state_machine = StateMachine(self)
         self.state_machine.start(initial_state_name)
         self.state_machine.last_state_change = get_time()  # 마지막 상태 변경 시간 초기화
-
+        self.shadow_y = self.y - 35
 
         self.tx, self.ty = 100, 100
         self.difp = None
         # self.build_behavior_tree()
-
 
         if Player.image_idle == None:
             Player.image_idle = load_image('./player/playerIdle.png')  # 384 x 43
@@ -568,6 +629,8 @@ class Player:
             Player.image_slide = load_image('./player/playerSlide.png')  # 645 x 43 , 15, 43
         if Player.image_smash == None:
             Player.image_smash = load_image('./player/playerSmash.png')  # 416 x 50 , 13, 32
+        if Player.image_shadow0 == None:
+            Player.image_shadow0 = load_image('./player/shadow0.png')  # 23 x 10
 
 
 
@@ -583,10 +646,15 @@ class Player:
         #     self.bt.run()
 
     def handle_event(self, event):
+        # if event.type == SDL_KEYDOWN and event.key == SDLK_SPACE:
+        #     self.shadow_y = self.y - 35  # 점프 시작 Y 좌표 업데이트
+
         self.state_machine.handle_event(('INPUT', event))
 
     def draw(self):
         self.state_machine.draw()
+        if self.state_machine.cur_state == Jump or self.state_machine.cur_state == Smash:
+            self.image_shadow0.clip_draw(0,0,23,10,self.x,  self.shadow_y ,22,10)  # 그림자의 위치를 플레이어 아래로 조정
         # self.font.draw(self.x - 10, self.y + 50, f'{self.ball_count:02d}', (255, 255, 0))
         # # 디버그용 바운딩박스 그리기
         draw_rectangle(*self.get_bb())  # 튜플을 풀어헤쳐서 인자로 전달.
