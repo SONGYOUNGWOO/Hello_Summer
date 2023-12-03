@@ -1,4 +1,4 @@
-from pico2d import load_image, draw_rectangle, get_time, clamp
+from pico2d import load_image, draw_rectangle, get_time, clamp, load_wav
 import game_world
 import game_framework
 import random
@@ -142,6 +142,9 @@ class StateMachine:
 
 class Ball:
     image = None
+    smashs_sound = None
+
+
 
     def __init__(self, x=30, y=win_h - 100, velocity=1):  # 초기값
         if Ball.image == None:
@@ -154,6 +157,12 @@ class Ball:
         self.btm ,self.top= self.y - 50, self.y + 6
         self.left,self.right = self.x - 24,self.x + 20
         self.dx, self.dy = 0, -1
+
+        if not Ball.smashs_sound:
+            Ball.smashs_sound = load_wav('./sound/smashs.wav') #동시에 여러 음악 재생시 wav로 진행
+            Ball.smashs_sound.set_volume(12)
+
+
 
     def update(self):
         self.state_machine.update()
@@ -186,6 +195,7 @@ class Ball:
             if self.x > win_w / 2:
                 self.dx, self.dy = -1, 1
             if other.action == '스매쉬':
+                Ball.smashs_sound.play()
                 self.state_machine.handle_event('SMASH')
             elif other.action == '슬라이드' or other.action == '리시브':
                 self.state_machine.handle_event('RECEIVE')

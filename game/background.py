@@ -1,4 +1,4 @@
-from pico2d import load_image, get_time, delay, draw_rectangle
+from pico2d import load_image, get_time, delay, draw_rectangle, load_music
 import game_framework
 
 global win_w, win_h
@@ -21,6 +21,9 @@ FRAMES_PER_ACTION = 6
 class Beach:
     def __init__(self):
         self.image_grass = load_image('./background/beachbkg2.png')
+        self.bgm = load_music('./sound/bkgmusic.wav')  # 배경음악은 music 다른 여려 음악 동시 재생 불가
+        self.bgm.set_volume(15)
+        self.bgm.repeat_play()
 
     def draw(self):
         self.image_grass.draw(win_w / 2, win_h / 2, win_w, win_h)
