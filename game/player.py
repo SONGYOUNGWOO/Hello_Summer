@@ -127,7 +127,7 @@ class RunRight:
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         player.x += RUN_SPEED_PPS * game_framework.frame_time
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h / 3)
+        player.y = clamp(25, player.y, win_h / 3)
         pass
 
     @staticmethod
@@ -159,7 +159,7 @@ class RunRightUp:
         player.x += RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.y += RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h / 3)
+        player.y = clamp(25, player.y, win_h / 3)
         pass
 
     @staticmethod
@@ -192,7 +192,7 @@ class RunRightDown:
         player.x += RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.y -= RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h / 3)
+        player.y = clamp(25, player.y, win_h / 3)
         pass
 
     @staticmethod
@@ -225,7 +225,7 @@ class RunLeft:
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         player.x -= RUN_SPEED_PPS * game_framework.frame_time
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h / 3)
+        player.y = clamp(25, player.y, win_h / 3)
         pass
 
     @staticmethod
@@ -259,7 +259,7 @@ class RunLeftUp:
         player.x -= RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.y += RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h / 3)
+        player.y = clamp(25, player.y, win_h / 3)
 
 
     @staticmethod
@@ -294,7 +294,7 @@ class RunLeftDown:
         player.y -= RUN_SPEED_PPS * game_framework.frame_time * 0.8
 
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h / 3)
+        player.y = clamp(25, player.y, win_h / 3)
 
 
     @staticmethod
@@ -328,7 +328,7 @@ class RunUp:
         player.y += RUN_SPEED_PPS * game_framework.frame_time
 
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h /3)
+        player.y = clamp(25, player.y, win_h /3)
         pass
 
     @staticmethod
@@ -359,7 +359,7 @@ class RunDown:
         player.y -= RUN_SPEED_PPS * game_framework.frame_time
 
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h - win_h / 3)
+        player.y = clamp(25, player.y, win_h / 3)
         pass
 
     @staticmethod
@@ -459,7 +459,7 @@ class Slide:  # 352 x 43 , 11, 32
         if get_time() - player.wait_time > 0.3:  # 시간으로 속도 조정
             player.state_machine.handle_event(('TIME_OUT', 0))
 
-        player.y = max(0, min(player.y, win_h - win_h / 3.3))
+        player.y = max(0, min(player.y, win_h / 3))
         player.x = max(10, min(player.x, win_w / 2 - 40))
 
     @staticmethod
@@ -493,9 +493,9 @@ class Smash:
     @staticmethod
     def do(player):
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 13
-        player.y += player.dir * RUN_SPEED_PPS * game_framework.frame_time * 3
+        player.y += RUN_SPEED_PPS * game_framework.frame_time * 3
         if get_time() - player.wait_time > 0.3:  # 시간으로 속도 조정
-            player.y -= (player.dir * RUN_SPEED_PPS * game_framework.frame_time) * 6
+            player.y -= (RUN_SPEED_PPS * game_framework.frame_time) * 6
         if get_time() - player.wait_time > 0.6:
             player.state_machine.handle_event(('TIME_OUT', 0))
 
@@ -518,32 +518,29 @@ class StateMachine:
             Idle: {D_down: RunRight, A_down: RunLeft, A_up: RunRight, D_up: RunLeft, W_down: RunUp,
                    S_down: RunDown, W_up: RunDown, S_up: RunUp,I_down: Slide,
                    space_down: Jump, P_down: Reception, O_down: Smash,U_down: self.player.change_character },
-            RunRight: {D_up: Idle, A_down: Idle, W_down: RunRightUp, W_up: RunRightDown,
+            RunRight: {D_up: Idle, A_down: Idle, A_up: Idle, W_down: RunRightUp, W_up: RunRightDown,
                        S_down: RunRightDown, S_up: RunRightUp,space_down: Jump,
-                       P_down: Reception, I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
-            RunRightUp: {W_up: RunRight, D_up: RunUp, A_down: RunUp, S_down: RunRight,
-                         space_down: Jump, P_down: Reception, O_down: Smash ,U_down:self.player.change_character},
-            RunUp: {W_up: Idle, A_down: RunLeftUp, S_down: Idle, D_down: RunRightUp,
-                    A_up: RunRightUp, D_up: RunLeftUp, space_down: Jump, P_down: Reception,
-                    O_down: Smash ,U_down:self.player.change_character},
-            RunLeftUp: {D_down: RunUp, S_down: RunLeft, A_up: RunUp, W_up: RunLeft,
-                        space_down: Jump, P_down: Reception, O_down: Smash ,U_down:self.player.change_character},
-            RunLeft: {A_up: Idle, W_down: RunLeftUp, D_down: Idle, S_down: RunLeftDown,
-                      W_up: RunLeftDown, S_up: RunLeftUp,
-                      space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
-            RunLeftDown: {A_up: RunDown, S_up: RunLeft, W_down: RunLeft, D_down: RunDown,
-                          space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
+                       P_down: Reception, U_down:self.player.change_character},
             RunDown: {S_up: Idle, A_down: RunLeftDown, W_down: Idle, D_down: RunRightDown,
-                      A_up: RunRightDown, D_up: RunLeftDown,space_down: Jump,
-                      P_down: Reception, I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
+                      A_up: RunRightDown, D_up: RunLeftDown, space_down: Jump,
+                      P_down: Reception, U_down: self.player.change_character},
+            RunLeft: {A_up: Idle, W_down: RunLeftUp, D_down: Idle, D_up: Idle, S_down: RunLeftDown,
+                      W_up: RunLeftDown, S_up: RunLeftUp,
+                      space_down: Jump, P_down: Reception, U_down: self.player.change_character},
+            RunUp: {W_up: Idle, A_down: RunLeftUp, D_down: RunRightUp,
+                    A_up: RunRightUp, D_up: RunLeftUp},
+            RunRightUp: {W_up: RunRight, D_up: RunUp, A_down: RunUp, S_down: RunRight},
+            RunLeftUp: {D_down: RunUp, S_down: RunLeft, A_up: RunUp, W_up: RunLeft},
+            RunLeftDown: {A_up: RunDown, S_up: RunLeft, W_down: RunLeft, D_down: RunDown,
+                          space_down: Jump, P_down: Reception, U_down:self.player.change_character},
             RunRightDown: {D_up: RunDown, S_up: RunRight, A_down: RunDown, W_down: RunRight
-                           ,space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash,U_down:self.player.change_character},
-            Jump: {time_out: Idle },
+                           ,space_down: Jump, P_down: Reception, U_down:self.player.change_character},
+            Jump: {time_out: Idle, D_up: Idle, A_up: Idle,S_up: Idle,W_up: Idle },
             Reception: {D_down: RunRight, A_down: RunLeft, D_up: Idle, A_up: Idle,
                         W_down: RunUp, S_down: RunDown, W_up: Idle, S_up: Idle,
                         space_down: Jump, time_out: Idle, O_down: Smash},
-            Slide: {time_out: Idle},
-            Smash: {time_out: Idle}
+            Slide: {time_out: Idle, D_up: Idle, A_up: Idle,S_up: Idle,W_up: Idle},
+            Smash: {time_out: Idle, D_up: Idle, A_up: Idle,S_up: Idle,W_up: Idle}
         }
 
     def start(self, initial_state_name="Idle"):
@@ -579,7 +576,6 @@ class StateMachine:
 
 
     def handle_event(self, e):
-
         for check_event, next_state in self.transitions[self.cur_state].items():
             if check_event(e):
                 self.cur_state.exit(self.player, e)
