@@ -1,7 +1,7 @@
 from pico2d import *
 import game_framework
 import play_mode
-# import title_mode
+import title_mode
 
 global win_w, win_h
 win_w, win_h = 1000, 600

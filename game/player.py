@@ -535,12 +535,12 @@ class StateMachine:
                           space_down: Jump, P_down: Reception, U_down:self.player.change_character},
             RunRightDown: {D_up: RunDown, S_up: RunRight, A_down: RunDown, W_down: RunRight
                            ,space_down: Jump, P_down: Reception, U_down:self.player.change_character},
-            Jump: {time_out: Idle, D_up: Idle, A_up: Idle,S_up: Idle,W_up: Idle },
+            Jump: {time_out: Idle, },
             Reception: {D_down: RunRight, A_down: RunLeft, D_up: Idle, A_up: Idle,
                         W_down: RunUp, S_down: RunDown, W_up: Idle, S_up: Idle,
                         space_down: Jump, time_out: Idle, O_down: Smash},
-            Slide: {time_out: Idle, D_up: Idle, A_up: Idle,S_up: Idle,W_up: Idle},
-            Smash: {time_out: Idle, D_up: Idle, A_up: Idle,S_up: Idle,W_up: Idle}
+            Slide: {time_out: Idle, },
+            Smash: {time_out: Idle, }
         }
 
     def start(self, initial_state_name="Idle"):

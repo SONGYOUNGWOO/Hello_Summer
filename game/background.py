@@ -40,12 +40,12 @@ class Net:
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 6
 
     def get_bb(self):
-        return self.x - 20, self.y - win_h / 2.4, self.x + 20, self.y + win_h / 2.4  # 튜플
+        return self.x - 20, self.y - win_h / 2.4, self.x + 20, self.y + win_h / 4  # 튜플
 
     def draw(self):
-        self.image.clip_composite_draw(int(self.frame) * 45, 0, 45, 375, - 3.141592 / 100, '', self.x, self.y, 45,
-                                       win_h/2)
-        #draw_rectangle(*self.get_bb())
+        self.image.clip_composite_draw(int(self.frame) * 45, 0, 45, 375, - 3.141592 / 100, '',
+                                       self.x, self.y, 45,win_h/2)
+        draw_rectangle(*self.get_bb())
 
     def handle_collision(self, group, other):
         pass

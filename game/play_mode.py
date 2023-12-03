@@ -71,6 +71,10 @@ def init():
     for player in players:
         game_world.add_collision_pair('player:ball', player, None)
 
+    game_world.add_collision_pair('enemy:ball', None, ball)
+    for player in enemy_team:
+        game_world.add_collision_pair('enemy:ball', player, None)
+
     # global balls
     # balls = [Ball(random.randint(0,1600),60,0) for _ in range(50)]
     # game_world.add_objects(balls,1)

@@ -8,7 +8,7 @@ global win_w, win_h
 win_w, win_h = 1000, 600
 
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
-RUN_SPEED_KMPH = 30.0  # Km / Hour
+RUN_SPEED_KMPH = 20.0  # Km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
@@ -19,103 +19,66 @@ ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 8
 
 DECELERATION = 0.05  # 매 프레임마다 속도가 감소하는 양
-MAX_VELOCITY = 3    # 공의 최대 속도
+MAX_VELOCITY = 3   # 공의 최대 속도
 def time_out(e):
     return e[0] == 'TIME_OUT'
-class Jumping:
-    def enter(ball, e):
-        ball.action_start_time = get_time()
-        ball.velocity = 2  # 초기 상승 속도
 
-    @staticmethod
-    def do(ball):
-        time_since_action = get_time() - ball.action_start_time
-
-        # 초기에는 위로 상승
-        if time_since_action < 0.5:
-            ball.dy = -1
-            ball.velocity = max(ball.velocity - DECELERATION, 0)
-        else:
-            # 이후 아래로 하강
-            ball.dy = 1
-            ball.velocity = min(ball.velocity + ball.GRAVITY * game_framework.frame_time, MAX_VELOCITY)
-
-        # 위치 업데이트
-        ball.y += ball.dy * RUN_SPEED_PPS * game_framework.frame_time * ball.velocity
-
-    def exit(ball, e):
-        pass
-
-    @staticmethod
-    def draw(ball):
-        ball.image.clip_draw(int(ball.frame) * 15, 0, 15, 70, ball.x, ball.y, 30, 50)
 class Idle:
     @staticmethod
     def enter(ball, e):
         ball.action_start_time = get_time()
-        ball.velocity = 2  # 초기 상승 속도
-
+        ball.velocity = 1  # 초기 상승 속도
 
     @staticmethod
     def do(ball):
-        time_since_action = get_time() - ball.action_start_time
+        ball.x += ball.dx * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+        ball.y += ball.dy * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+        if (ball.dx < 0 and ball.left <= 10) or (ball.dx > 0 and ball.right >= win_w - 10):
+            ball.dx *= -1
+            ball.x += ball.dx * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
 
-        # 초기에는 위로 상승
-        if time_since_action < 0.5:
-            ball.dy = -1
-            ball.velocity = max(ball.velocity - DECELERATION, 0)
-        else:
-            # 이후 아래로 하강
-            ball.dy = 1
-            ball.velocity = min(ball.velocity + ball.GRAVITY * game_framework.frame_time, MAX_VELOCITY)
-
-        # 위치 업데이트
-        ball.y += ball.dy * RUN_SPEED_PPS * game_framework.frame_time * ball.velocity
+        if (ball.dy < 0 and ball.btm <= 0) or (ball.dy > 0 and ball.top >= win_h - 10):
+            ball.dy *= -1
+            ball.y += ball.dy * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
 
     def exit(ball, e):
         pass
 
     @staticmethod
     def draw(ball):
-        ball.image.clip_draw(int(ball.frame) * 15, 0, 15, 70, ball.x, ball.y, 30, 50)
-        # if ball.face_dir == '오른쪽':
-        #     ball.image_idle.clip_draw(int(ball.frame) * 32, 0, 32, 43, ball.x, ball.y, 48, 65)
-        # else:
-        #     ball.image_idle.clip_composite_draw(int(ball.frame) * 32, 0, 32, 43,
-        #                                           0, 'h', ball.x, ball.y, 48, 65)
+        ball.image.clip_draw(int(ball.frame) * 15, 0, 15, 70, ball.x, ball.y, 60, 100)
+
 class Receive:
     @staticmethod
     def enter(ball, e):
         ball.action_start_time = get_time()
-        ball.velocity = 2  # 초기 속도 설정
+        ball.velocity = 1  # 초기 속도 설정
 
     @staticmethod
     def exit(ball, e):
-        # 리시브 상태에서 나갈 때 필요한 로직
         pass
 
     @staticmethod
     def do(ball):
-        ball.frame = (ball.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
-        # 리시브 상태에서의 공의 움직임을 구현
-        time_since_action = get_time() - ball.action_start_time
-        if time_since_action < 0.5:
-            ball.dy = -1  # 위로 이동
-        else:
-            ball.dy = 1  # 아래로 이동
-        ball.y += ball.dy * ball.velocity
-
+        ball.x += ball.dx * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+        ball.y += ball.dy * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+        if (ball.dx < 0 and ball.left <= 10) or (ball.dx > 0 and ball.right >= win_w - 10):
+            ball.dx *= -1
+            ball.x += ball.dx * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+        if (ball.dy < 0 and ball.btm <= 0) or (ball.dy > 0 and ball.top >= win_h - 10):
+            ball.dy *= -1
+            ball.y += ball.dy * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
 
     @staticmethod
     def draw(ball):
-        # 리시브 상태에서의 공 그리기 로직
-        ball.image.clip_draw(int(ball.frame) * 15, 0, 15, 70, ball.x, ball.y, 30, 50)
+        ball.image.clip_draw(int(ball.frame) * 15, 0, 15, 70, ball.x, ball.y, 60, 100)
 
 
 class Smash:
     def enter(ball, e):
         ball.action_start_time = get_time()
-        ball.velocity = 4 # 초기 속도 설정
+        ball.velocity = 2 # 초기 속도 설정
+        ball.dy = -1
 
     @staticmethod
     def exit(ball, e):
@@ -123,16 +86,24 @@ class Smash:
 
     @staticmethod
     def do(ball):
-        ball.frame = (ball.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
-        # 리시브 상태에서의 공의 움직임을 구현
-        ball.dy, ball.dx = 1, 1
-        ball.x += ball.dx * ball.velocity
-        ball.y += ball.dy * ball.velocity
+        ball.x += ball.dx * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+        ball.y += ball.dy * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+        # if (ball.dx < 0 and ball.left <= 10) or (ball.dx > 0 and ball.right >= win_w - 10):
+        #     ball.dx *= -1
+        #     ball.x += ball.dx * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+        #
+        # if (ball.dy < 0 and ball.btm <= 0) or (ball.dy > 0 and ball.top >= win_h - 10):
+        #     ball.dy *= -1
+        #     ball.y += ball.dy * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+
+        if get_time() - ball.action_start_time > 0.3:  # 시간으로 속도 조정
+            ball.state_machine.handle_event(('TIME_OUT', 0))
+
+
 
     @staticmethod
     def draw(ball):
-        # 리시브 상태에서의 공 그리기 로직
-        ball.image.clip_draw(int(ball.frame) * 15, 0, 15, 70, ball.x, ball.y, 30, 50)
+        ball.image.clip_draw(int(ball.frame) * 15, 0, 15, 70, ball.x, ball.y, 60, 100)
 
 # 상태 머신 클래스
 
@@ -142,13 +113,13 @@ class StateMachine:
         self.cur_state = Idle
 
         self.transitions = {
-            Idle: {'RECEIVE': Receive, 'SMASH': Smash, 'JUMPING':Jumping},
+            Idle: {'RECEIVE': Receive, 'SMASH': Smash, },
             Receive: {'TIME_OUT': Idle},
             Smash: {'TIME_OUT': Idle},
-            Jumping:{'RECEIVE': Receive, 'SMASH': Smash}
         }
 
     def update(self):
+
         self.cur_state.do(self.ball)
         #
         # if self.player in play_mode.enemy_team:
@@ -171,7 +142,6 @@ class StateMachine:
 
 class Ball:
     image = None
-    GRAVITY = -5
 
     def __init__(self, x=30, y=win_h - 100, velocity=1):  # 초기값
         if Ball.image == None:
@@ -181,19 +151,23 @@ class Ball:
         self.wait_time = get_time()
         self.action_start_time = 0
         self.x, self.y, self.velocity, self.frame = x, y, velocity, 0
-        self.dx, self.dy = 0, 1
-        self.hit = False
-        self.mode = 'idle'
+        self.btm ,self.top= self.y - 50, self.y + 6
+        self.left,self.right = self.x - 24,self.x + 20
+        self.dx, self.dy = 0, -1
 
     def update(self):
         self.state_machine.update()
-        if self.y <= 10:
-            self.y = 10  # 공의 y 위치를 바닥에 고정
+        if self.y >= win_h - 10:
+            self.dy = -1  # 아래로 떨어지도록 방향 변경
+        if self.y <= 20:
+            self.y = 20  # 공의 y 위치를 바닥에 고정
             self.velocity = 0  # 공의 속도를 0으로 설정하여 멈춤
 
 
     def get_bb(self):
-        return self.x - 12, self.y - 25, self.x + 12, self.y + 8
+        self.btm, self.top = self.y - 50, self.y + 6
+        self.left, self.right = self.x - 24, self.x + 20
+        return self.left, self.btm, self.right, self.top
 
     def draw(self):
         self.state_machine.draw()
@@ -201,13 +175,21 @@ class Ball:
 
     def handle_collision(self, group, other):
         if group == 'player:ball':
+            if self.x < win_w / 2:
+                self.dx, self.dy = 1, 1
             if other.action == '스매쉬':
                 self.state_machine.handle_event('SMASH')
             elif other.action == '슬라이드' or other.action == '리시브':
                 self.state_machine.handle_event('RECEIVE')
-            else:
-                self.state_machine.handle_event('JUMPING')
-            self.hit = True
+
+        elif group == 'enemy:ball':
+            if self.x > win_w / 2:
+                self.dx, self.dy = -1, 1
+            if other.action == '스매쉬':
+                self.state_machine.handle_event('SMASH')
+            elif other.action == '슬라이드' or other.action == '리시브':
+                self.state_machine.handle_event('RECEIVE')
+
 
         # MAX_VELOCITY = 2
         # DECELERATION = 0.2
