@@ -114,12 +114,9 @@ class Idle:
 class RunRight:
     @staticmethod
     def enter(player, e):
+        player.face_dir = '오른쪽'
+        player.dir = 1
 
-        if player.face_dir == '오른쪽' :
-            player.dir = 1
-        else :
-            player.dir = -1
-        pass
 
     @staticmethod
     def exit(player, e):
@@ -144,12 +141,13 @@ class RunRight:
 class RunRightUp:
     @staticmethod
     def enter(player, e):
-
-        if player.face_dir == '오른쪽' :
-            player.dir = 1
-        else :
-            player.dir = -1
-        pass
+        player.face_dir = '오른쪽'
+        player.dir = 1
+        # if player.face_dir == '오른쪽' :
+        #     player.dir = 1
+        # else :
+        #     player.dir = -1
+        # pass
 
     @staticmethod
     def exit(player, e):
@@ -176,12 +174,13 @@ class RunRightUp:
 class RunRightDown:
     @staticmethod
     def enter(player, e):
-
-        if player.face_dir == '오른쪽' :
-            player.dir = 1
-        else :
-            player.dir = -1
-        pass
+        player.face_dir = '오른쪽'
+        player.dir = 1
+        # if player.face_dir == '오른쪽' :
+        #     player.dir = 1
+        # # else :
+        #     player.dir = -1
+        # pass
 
     @staticmethod
     def exit(player, e):
@@ -208,12 +207,14 @@ class RunRightDown:
 class RunLeft:
     @staticmethod
     def enter(player, e):
-
-        if player.face_dir == '오른쪽' :
-            player.dir = 1
-        else :
-            player.dir = -1
-        pass
+        player.face_dir = '왼쪽'
+        player.dir = -1
+        #
+        # if player.face_dir == '오른쪽' :
+        #     player.dir = 1
+        # else :
+        #     player.dir = -1
+        # pass
 
     @staticmethod
     def exit(player, e):
@@ -230,21 +231,23 @@ class RunLeft:
     @staticmethod
     def draw(player):
         if player.face_dir == '오른쪽':
+            Player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        else:
             Player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
                                                  player.x, player.y, 48, 65)
-        else:
-            Player.image_run.clip_composite_draw(int(player.frame) * 32,0, 32, 43, player.x, player.y, 48, 65)
+
 
 
 class RunLeftUp:
     @staticmethod
     def enter(player, e):
-
-        if player.face_dir == '오른쪽' :
-            player.dir = 1
-        else :
-            player.dir = -1
-        pass
+        player.face_dir = '왼쪽'
+        player.dir = -1
+        # if player.face_dir == '오른쪽' :
+        #     player.dir = 1
+        # else :
+        #     player.dir = -1
+        # pass
 
     @staticmethod
     def exit(player, e):
@@ -262,22 +265,23 @@ class RunLeftUp:
     @staticmethod
     def draw(player):
         if player.face_dir == '오른쪽':
+            Player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, player.x, player.y, 48, 65)
+        else:
             Player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
                                                  player.x, player.y, 48, 65)
-        else:
-            Player.image_run.clip_composite_draw(int(player.frame) * 32,0, 32, 43, player.x, player.y, 48, 65)
+
 
 
 
 class RunLeftDown:
     @staticmethod
     def enter(player, e):
+        player.face_dir = '왼쪽'
+        player.dir = -1
+        # if player.face_dir == '오른쪽' :
+        #     player.dir = 1
+        # else :
 
-        if player.face_dir == '오른쪽' :
-            player.dir = 1
-        else :
-            player.dir = -1
-        pass
 
     @staticmethod
     def exit(player, e):
@@ -296,10 +300,10 @@ class RunLeftDown:
     @staticmethod
     def draw(player):
         if player.face_dir == '오른쪽':
+            Player.image_run.clip_composite_draw(int(player.frame) * 32,0, 32, 43, player.x, player.y, 48, 65)
+        else:
             Player.image_run.clip_composite_draw(int(player.frame) * 32, 0, 32, 43, 0, 'h',
                                                  player.x, player.y, 48, 65)
-        else:
-            Player.image_run.clip_composite_draw(int(player.frame) * 32,0, 32, 43, player.x, player.y, 48, 65)
 
 
 
@@ -387,9 +391,9 @@ class Jump:
     @staticmethod
     def do(player):
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 13
-        player.y += player.dir * RUN_SPEED_PPS * game_framework.frame_time * 3
+        player.y += RUN_SPEED_PPS * game_framework.frame_time * 3
         if get_time() - player.wait_time > 0.2:  # 시간으로 속도 조정
-            player.y -= (player.dir * RUN_SPEED_PPS * game_framework.frame_time) * 6
+            player.y -= (RUN_SPEED_PPS * game_framework.frame_time) * 6
         if get_time() - player.wait_time > 0.4:
             player.state_machine.handle_event(('TIME_OUT', 0))
 
@@ -438,12 +442,11 @@ class Slide:  # 352 x 43 , 11, 32
         player.action = '슬라이드'
         player.frame = 0
         player.wait_time = get_time()  # pico2d import 필요
-
-        if player.face_dir == '오른쪽' :
+        if player.face_dir == '오른쪽':
             player.dir = 1
-        else :
+        else:
             player.dir = -1
-        pass
+
 
     @staticmethod
     def exit(player, e):
@@ -513,18 +516,18 @@ class StateMachine:
 
         self.transitions = {
             Idle: {D_down: RunRight, A_down: RunLeft, A_up: RunRight, D_up: RunLeft, W_down: RunUp,
-                   S_down: RunDown, W_up: RunDown, S_up: RunUp,
+                   S_down: RunDown, W_up: RunDown, S_up: RunUp,I_down: Slide,
                    space_down: Jump, P_down: Reception, O_down: Smash,U_down: self.player.change_character },
             RunRight: {D_up: Idle, A_down: Idle, W_down: RunRightUp, W_up: RunRightDown,
                        S_down: RunRightDown, S_up: RunRightUp,space_down: Jump,
                        P_down: Reception, I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
             RunRightUp: {W_up: RunRight, D_up: RunUp, A_down: RunUp, S_down: RunRight,
-                         space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
+                         space_down: Jump, P_down: Reception, O_down: Smash ,U_down:self.player.change_character},
             RunUp: {W_up: Idle, A_down: RunLeftUp, S_down: Idle, D_down: RunRightUp,
                     A_up: RunRightUp, D_up: RunLeftUp, space_down: Jump, P_down: Reception,
-                    I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
+                    O_down: Smash ,U_down:self.player.change_character},
             RunLeftUp: {D_down: RunUp, S_down: RunLeft, A_up: RunUp, W_up: RunLeft,
-                        space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
+                        space_down: Jump, P_down: Reception, O_down: Smash ,U_down:self.player.change_character},
             RunLeft: {A_up: Idle, W_down: RunLeftUp, D_down: Idle, S_down: RunLeftDown,
                       W_up: RunLeftDown, S_up: RunLeftUp,
                       space_down: Jump, P_down: Reception, I_down: Slide, O_down: Smash ,U_down:self.player.change_character},
