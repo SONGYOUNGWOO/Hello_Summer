@@ -29,9 +29,50 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_u:
             switch_to_next_character()
 
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_r:
+            restart_game()
+
         else:
             player_slect.handle_event(event)
+def restart_game():
+    global players, enemy_team, ball, player_slect, beach, net
 
+    # 게임 객체들을 제거합니다.
+    game_world.clear()
+
+    # 게임 환경을 다시 초기화합니다.
+    beach = Beach()
+    game_world.add_object(beach, 0)
+
+    net = Net()
+    game_world.add_object(net, 0)
+
+    players = [Player(win_w/2- 80, win_h/4), Player(80, 100)]
+    for player in players:
+        game_world.add_object(player, 1)
+    player_slect = players[0]
+
+    enemy_team = [Player(win_w/2 + 100, win_h/4, "RunUp"),
+                  Player(win_w - 80, 100, "RunDown")]
+    for player in enemy_team:
+        player.face_dir = '왼쪽'
+        game_world.add_object(player, 1)
+
+    ball = Ball()
+    game_world.add_object(ball, 1)
+
+    # 콜리전 페어를 다시 추가합니다.
+    game_world.add_collision_pair('player:net', None, net)
+    for player in players:
+        game_world.add_collision_pair('player:net', player, None)
+
+    game_world.add_collision_pair('player:ball', None, ball)
+    for player in players:
+        game_world.add_collision_pair('player:ball', player, None)
+
+    game_world.add_collision_pair('enemy:ball', None, ball)
+    for player in enemy_team:
+        game_world.add_collision_pair('enemy:ball', player, None)
 
 def init():
     global beach

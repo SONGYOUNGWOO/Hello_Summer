@@ -96,7 +96,8 @@ class Smash:
         #     ball.dy *= -1
         #     ball.y += ball.dy * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
 
-        if get_time() - ball.action_start_time > 0.3:  # 시간으로 속도 조정
+        if get_time() - ball.action_start_time > 1:  # 시간으로 속도 조정
+            ball.velocity = 1
             ball.state_machine.handle_event(('TIME_OUT', 0))
 
 
@@ -119,7 +120,6 @@ class StateMachine:
         }
 
     def update(self):
-
         self.cur_state.do(self.ball)
         #
         # if self.player in play_mode.enemy_team:
@@ -160,7 +160,7 @@ class Ball:
 
         if not Ball.smashs_sound:
             Ball.smashs_sound = load_wav('./sound/smashs.wav') #동시에 여러 음악 재생시 wav로 진행
-            Ball.smashs_sound.set_volume(12)
+            Ball.smashs_sound.set_volume(24)
 
 
 
@@ -168,9 +168,12 @@ class Ball:
         self.state_machine.update()
         if self.y >= win_h - 10:
             self.dy = -1  # 아래로 떨어지도록 방향 변경
-        if self.y <= 20:
+        if self.y <= 20 :
             self.y = 20  # 공의 y 위치를 바닥에 고정
             self.velocity = 0  # 공의 속도를 0으로 설정하여 멈춤
+
+        if self.x < 0 or self.y < 0 or self.y > win_h or self.x > win_w:
+            pass
 
 
     def get_bb(self):

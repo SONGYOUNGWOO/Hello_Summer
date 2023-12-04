@@ -12,6 +12,17 @@ def change_mode(mode):
     stack.append(mode)
     mode.init()
 
+# def restart_game(mode):
+#     global stack
+#     # Clear the mode stack and reinitialize the game with the start mode
+#     while len(stack) > 0:
+#         stack[-1].finish()
+#         stack.pop()
+#
+#     # Assuming you have a start_mode or similar to initialize the game
+#     start_mode = mode()  # Replace with your method to get the start mode
+#     run(start_mode)
+#
 
 def push_mode(mode):
     global stack
