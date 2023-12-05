@@ -88,15 +88,7 @@ class Smash:
     def do(ball):
         ball.x += ball.dx * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
         ball.y += ball.dy * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
-        # if (ball.dx < 0 and ball.left <= 10) or (ball.dx > 0 and ball.right >= win_w - 10):
-        #     ball.dx *= -1
-        #     ball.x += ball.dx * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
-        #
-        # if (ball.dy < 0 and ball.btm <= 0) or (ball.dy > 0 and ball.top >= win_h - 10):
-        #     ball.dy *= -1
-        #     ball.y += ball.dy * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
-
-        if get_time() - ball.action_start_time > 1:  # 시간으로 속도 조정
+        if get_time() - ball.action_start_time > 1.5:  # 시간으로 속도 조정
             ball.velocity = 1
             ball.state_machine.handle_event(('TIME_OUT', 0))
 
@@ -164,6 +156,11 @@ class Ball:
         if not Ball.smashs_sound:
             Ball.smashs_sound = load_wav('./sound/smashs.wav') #동시에 여러 음악 재생시 wav로 진행
             Ball.smashs_sound.set_volume(24)
+
+    def reset_position(self):
+        self.x = 30
+        self.y = win_h - 100
+        self.velocity = 1
 
 
 

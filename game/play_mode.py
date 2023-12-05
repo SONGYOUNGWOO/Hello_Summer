@@ -10,6 +10,9 @@ from player import Player
 from ball import Ball
 
 win_w ,win_h = 1000, 600
+global enemy_score, ally_score
+enemy_score = 0
+ally_score = 0
 # boy = None
 def switch_to_next_character():
     global player_slect
@@ -81,6 +84,22 @@ def init():
     global net
     global ball
     global player_slect
+    global enemy_score, ally_score
+    global n1,n2,n3,n4,n5,n6,n7,n8,n9,n0
+
+    n1 = load_image('./number/1.png')
+    n2 = load_image('./number/2.png')
+    n3 = load_image('./number/3.png')
+    n4 = load_image('./number/4.png')
+    n5 = load_image('./number/5.png')
+    n6 = load_image('./number/6.png')
+    n7 = load_image('./number/7.png')
+    n8 = load_image('./number/8.png')
+    n9 = load_image('./number/9.png')
+    n0 = load_image('./number/0.png')
+
+    enemy_score = 0
+    ally_score = 0
 
     running = True
 
@@ -135,7 +154,17 @@ def finish():
 def update():
     game_world.update()
     game_world.handle_collisions()
-    # fill here
+
+    global enemy_score, ally_score
+    print(ball.y)
+    if ball.y <= 100:  # 예: 바닥에 닿는 y값
+        if ball.x > win_w / 2:
+            enemy_score += 1
+        else:
+            ally_score += 1
+        ball.reset_position()
+
+        # fill here
     # for ball in balls.copy():
     #     if game_world.collide(boy, ball):
     #         print('COLLISION boy:Ball')
@@ -143,10 +172,23 @@ def update():
     #         balls.remove(ball)
     #         game_world.remove_object(ball)  # 볼을 제거
 
+def draw_number(x, y, number, scale=0.1):
+    global n0, n1, n2, n3, n4, n5, n6, n7, n8, n9
+    number_images = [n0, n1, n2, n3, n4, n5, n6, n7, n8, n9]
+
+    digits = [int(i) for i in str(number)]  # 숫자를 각 자리수로 분리
+    digit_width = 10 * scale  # 각 숫자 이미지의 조정된 너비
+    digit_height = 20 * scale  # 각 숫자 이미지의 조정된 높이
+
+    for i, digit in enumerate(digits):
+        number_images[digit].draw(x + i * digit_width, y, digit_width, digit_height)
+
 
 def draw():
     clear_canvas()
     game_world.render()
+    draw_number(50, win_h - 50, enemy_score, scale=5 )  # 적 점수
+    draw_number(win_w - 100, win_h - 50, ally_score, scale=5)  # 아군 점수
     update_canvas()
 
 
