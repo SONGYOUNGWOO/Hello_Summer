@@ -192,7 +192,7 @@ def draw_number(x, y, number, scale=0.1):
 def draw():
     clear_canvas()
     game_world.render()
-    draw_number(50, win_h - 50, ally_score, scale=5 )  # 적 점수
+    draw_number(100, win_h - 50, ally_score, scale=5 )  # 적 점수
     draw_number(win_w - 100, win_h - 50, enemy_score, scale=5)  # 아군 점수
     update_canvas()
 

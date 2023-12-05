@@ -390,7 +390,7 @@ class Jump:
 
     @staticmethod
     def do(player):
-
+        #player.jump_sound.play()
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 13
         player.y += RUN_SPEED_PPS * game_framework.frame_time * 3
         if get_time() - player.wait_time > 0.2:  # 시간으로 속도 조정
@@ -494,14 +494,12 @@ class Smash:
     @staticmethod
     def do(player):
 
-        if player.face_dir == '오른쪽':
             player.smash_sound.play()
-
             player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 13
             player.y += RUN_SPEED_PPS * game_framework.frame_time * 3
-            if get_time() - player.wait_time > 0.4:  # 시간으로 속도 조정
+            if get_time() - player.wait_time > 0.3:  # 시간으로 속도 조정
                 player.y -= (RUN_SPEED_PPS * game_framework.frame_time) * 6
-            if get_time() - player.wait_time > 0.8:
+            if get_time() - player.wait_time > 0.6:
                 player.state_machine.handle_event(('TIME_OUT', 0))
 
     @staticmethod
@@ -655,6 +653,7 @@ class Player:
     image_slide = None
     image_smash = None
     image_shadow1 = None
+    jump_sound = None
 
 
     def __init__(self, x = 50, y = win_h / 2.6 , initial_state_name="Idle"):
@@ -684,6 +683,8 @@ class Player:
             Player.image_shadow1 = load_image('./player/shadow1.png')  # 23 x 10
             Player.smash_sound = load_wav('./sound/smashs.wav')  # 동시에 여러 음악 재생시 wav로 진행
             Player.smash_sound.set_volume(24)
+            Player.jump_sound = load_wav('./sound/jump.wav')  # 동시에 여러 음악 재생시 wav로 진행
+            Player.jump_sound.set_volume(12)
 
 
     def update(self):

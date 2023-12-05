@@ -13,7 +13,7 @@ def init():
     global imagesui
     global imageexit
     global ocean_sound
-    
+
     ocean_sound = load_music('./sound/ocean.mp3')  # 동시에 여러 음악 재생시 wav로 진행
     ocean_sound.repeat_play()
 

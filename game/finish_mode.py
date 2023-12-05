@@ -15,11 +15,22 @@ def init():
     global image_victory
     global image_defeat
     global bkg
+    global defeat_sound
+    global victory_sound
 
     bkg = load_image('./background/sky.png')
     image_won = load_image('./background/won.png')
     image_victory = load_image('./background/victory.png')
     image_defeat = load_image('./background/defeat.png')
+    defeat_sound = load_music('./sound/defeat.mp3')  # 동시에 여러 음악 재생시 wav로 진행
+    defeat_sound.set_volume(24)
+    victory_sound = load_music('./sound/victory.mp3')  # 동시에 여러 음악 재생시 wav로 진행
+    victory_sound.set_volume(24)
+    if play_mode.ally_score >= 5:
+        victory_sound.play()
+    else:
+        defeat_sound.play()
+
 
 
 def finish():
@@ -36,12 +47,11 @@ def update():
 def draw():
     clear_canvas()
     bkg.draw(win_w / 2, win_h / 2, win_w , win_h )
-    print(play_mode.ally_score, play_mode.enemy_score)
+    #print(play_mode.ally_score, play_mode.enemy_score)
     if play_mode.ally_score >= 5:
         image_victory.draw(win_w / 2, win_h / 2, 300, 100)
     if play_mode.enemy_score >= 5:
         image_defeat.draw(win_w / 2, win_h / 2 , 300, 100)
-
     update_canvas()
 
 def handle_events():
