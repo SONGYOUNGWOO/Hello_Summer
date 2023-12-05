@@ -138,6 +138,9 @@ class StateMachine:
     def draw(self):
         self.cur_state.draw(self.ball)
 
+enemy_score = 0
+ally_score = 0
+
 
 
 class Ball:
@@ -165,15 +168,22 @@ class Ball:
 
 
     def update(self):
+        global enemy_score, ally_score  # 전역 변수 사용
+
         self.state_machine.update()
         if self.y >= win_h - 10:
             self.dy = -1  # 아래로 떨어지도록 방향 변경
-        if self.y <= 20 :
-            self.y = 20  # 공의 y 위치를 바닥에 고정
-            self.velocity = 0  # 공의 속도를 0으로 설정하여 멈춤
+        if self.y <= 20:  # 공이 바닥에 닿으면
+            if self.x < win_w / 2:
+                enemy_score += 1  # 적팀 점수 증가
+            else:
+                ally_score += 1  # 아군팀 점수 증가
 
-        if self.x < 0 or self.y < 0 or self.y > win_h or self.x > win_w:
-            pass
+            # 점수 업데이트 후 게임 재시작
+            game_framework.change_mode(play_mode)
+            return
+
+
 
 
     def get_bb(self):
@@ -183,7 +193,15 @@ class Ball:
 
     def draw(self):
         self.state_machine.draw()
+        self.draw_score()  # 점수를 화면에 출력하는 함수 호출
         draw_rectangle(*self.get_bb())
+
+    def draw_score(self):
+        # 점수를 화면에 출력하는 함수
+        # 여기에서는 font 라이브러리를 사용하여 점수를 출력합니다.
+        # font = load_font(...)
+        # font.draw(위치, f'Enemy: {enemy_score} Ally: {ally_score}')
+        pass
 
     def handle_collision(self, group, other):
         if group == 'player:ball':
