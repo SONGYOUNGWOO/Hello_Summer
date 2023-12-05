@@ -1,6 +1,6 @@
 # 이것은 각 상태들을 객체로 구현한 것임.
 from pico2d import (get_time, load_image, SDL_KEYDOWN, SDL_KEYUP, SDLK_SPACE, SDLK_LEFT, SDLK_RIGHT, SDLK_w, SDLK_a,
-                    SDLK_s, SDLK_d, SDLK_k, SDLK_p, SDLK_i, SDLK_o,SDLK_m, SDLK_u, draw_rectangle, clamp)
+                    SDLK_s, SDLK_d, SDLK_k, SDLK_p, SDLK_i, SDLK_o,SDLK_m, SDLK_u, draw_rectangle, clamp, load_wav)
 from ball import Ball
 import game_world
 import game_framework
@@ -127,7 +127,7 @@ class RunRight:
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         player.x += RUN_SPEED_PPS * game_framework.frame_time
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h / 3)
+        player.y = clamp(50, player.y, win_h / 3)
         pass
 
     @staticmethod
@@ -159,7 +159,7 @@ class RunRightUp:
         player.x += RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.y += RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h / 3)
+        player.y = clamp(50, player.y, win_h / 3)
         pass
 
     @staticmethod
@@ -192,7 +192,7 @@ class RunRightDown:
         player.x += RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.y -= RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h / 3)
+        player.y = clamp(50, player.y, win_h / 3)
         pass
 
     @staticmethod
@@ -225,7 +225,7 @@ class RunLeft:
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 12
         player.x -= RUN_SPEED_PPS * game_framework.frame_time
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h / 3)
+        player.y = clamp(50, player.y, win_h / 3)
         pass
 
     @staticmethod
@@ -259,7 +259,7 @@ class RunLeftUp:
         player.x -= RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.y += RUN_SPEED_PPS * game_framework.frame_time * 0.8
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h / 3)
+        player.y = clamp(50, player.y, win_h / 3)
 
 
     @staticmethod
@@ -294,7 +294,7 @@ class RunLeftDown:
         player.y -= RUN_SPEED_PPS * game_framework.frame_time * 0.8
 
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h / 3)
+        player.y = clamp(50, player.y, win_h / 3)
 
 
     @staticmethod
@@ -328,7 +328,7 @@ class RunUp:
         player.y += RUN_SPEED_PPS * game_framework.frame_time
 
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h /3)
+        player.y = clamp(50, player.y, win_h /3)
         pass
 
     @staticmethod
@@ -359,7 +359,7 @@ class RunDown:
         player.y -= RUN_SPEED_PPS * game_framework.frame_time
 
         player.x = clamp(20, player.x, win_w - 10)
-        player.y = clamp(25, player.y, win_h / 3)
+        player.y = clamp(50, player.y, win_h / 3)
         pass
 
     @staticmethod
@@ -390,12 +390,14 @@ class Jump:
 
     @staticmethod
     def do(player):
+
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 13
         player.y += RUN_SPEED_PPS * game_framework.frame_time * 3
         if get_time() - player.wait_time > 0.2:  # 시간으로 속도 조정
             player.y -= (RUN_SPEED_PPS * game_framework.frame_time) * 6
         if get_time() - player.wait_time > 0.4:
             player.state_machine.handle_event(('TIME_OUT', 0))
+
 
     @staticmethod
     def draw(player):
@@ -484,7 +486,6 @@ class Smash:
         player.wait_time = get_time()  # pico2d import 필요
 
 
-
     @staticmethod
     def exit(player, e):
         play_mode.ball_mode = 'smash'
@@ -492,12 +493,16 @@ class Smash:
 
     @staticmethod
     def do(player):
-        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 13
-        player.y += RUN_SPEED_PPS * game_framework.frame_time * 3
-        if get_time() - player.wait_time > 0.4:  # 시간으로 속도 조정
-            player.y -= (RUN_SPEED_PPS * game_framework.frame_time) * 6
-        if get_time() - player.wait_time > 0.8:
-            player.state_machine.handle_event(('TIME_OUT', 0))
+
+        if player.face_dir == '오른쪽':
+            player.smash_sound.play()
+
+            player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 13
+            player.y += RUN_SPEED_PPS * game_framework.frame_time * 3
+            if get_time() - player.wait_time > 0.4:  # 시간으로 속도 조정
+                player.y -= (RUN_SPEED_PPS * game_framework.frame_time) * 6
+            if get_time() - player.wait_time > 0.8:
+                player.state_machine.handle_event(('TIME_OUT', 0))
 
     @staticmethod
     def draw(player):
@@ -570,48 +575,57 @@ class StateMachine:
     def update(self):
         self.cur_state.do(self.player)
 
-        if self in play_mode.enemy_team:
-            current_time = get_time()
-            if current_time - self.state_machine.last_state_change > self.state_machine.state_duration:
-                self.state_machine.change_state()
-                self.state_machine.last_state_change = current_time
-
-        # if self.player in play_mode.enemy_team:
-        #     if get_time() - self.last_state_change > self.state_duration:
-        #         self.change_state()
-        #         self.last_state_change = get_time()
+        if self.player in play_mode.enemy_team:
+            if get_time() - self.last_state_change > self.state_duration:
+                self.change_state()
+                self.last_state_change = get_time()
 
     def get_state_by_name(self, state_name):
         return {
             "Idle": Idle,
             "RunUp": RunUp,
             "RunDown": RunDown,
-            "Smash" : Smash,
+            # "Smash" : Smash,
             "Jump" : Jump
-            # 기타 상태 이름과 클래스 매핑...
         }.get(state_name, Idle)
 
     def change_state(self):
-        if self.player_type == 'a':
-            if self.state_machine.cur_state == RunUp or self.state_machine.cur_state == RunDown:
-                next_state = self.state_machine.get_state_by_name("Smash")
-            else:
-                next_state = self.state_machine.get_state_by_name("RunUp")  # 또는 "RunDown"
-        elif self.player_type == 'b':
-            if self.state_machine.cur_state == RunUp or self.state_machine.cur_state == RunDown:
-                next_state = self.state_machine.get_state_by_name("Jump")
-            else:
-                next_state = self.state_machine.get_state_by_name("RunUp")  # 또는 "RunDown"
+        # Idle 상태에서 다음 상태를 무작위로 선택
+        if self.cur_state == Idle:
+            next_state = random.choice([RunUp, RunDown,  Jump])
+        # RunUp 상태에서 다음 상태 결정
+        elif self.cur_state == RunUp:
+            next_state = random.choice([RunDown,  Jump])
+        # RunDown 상태에서 다음 상태 결정
+        elif self.cur_state == RunDown:
+            next_state = random.choice([RunUp,  Jump])
+        # 다른 상태에서는 Idle로 전환
+        else:
+            next_state = Idle
 
-        self.state_machine.cur_state.exit(self, None)
-        self.state_machine.cur_state = next_state
-        self.state_machine.cur_state.enter(self, None)
+        # 상태 전환 수행
+        self.cur_state.exit(self.player, None)
+        self.cur_state = next_state
+        self.cur_state.enter(self.player, None)
 
     # def change_state(self):
     #     if self.cur_state == RunUp:
-    #         next_state = RunDown
+    #         if self.cur_state == RunUp:
+    #             if self.cur_state == Idle:
+    #                 next_state = random.choice([RunDown, Smash, Jump])
+    #         else:
+    #             # 그렇지 않은 경우 RunUp과 RunDown을 번갈아 선택
+    #             if self.cur_state == Idle:
+    #                 next_state = RunDown if self.cur_state == RunDown else RunUp
     #     else:
-    #         next_state = RunUp
+    #         if self.cur_state == RunDown:
+    #             if self.cur_state == Idle:
+    #                 next_state = random.choice([RunUp, Smash, Jump])
+    #         else:
+    #             # 그렇지 않은 경우 RunUp과 RunDown을 번갈아 선택
+    #             if self.cur_state == Idle:
+    #                 next_state = RunUp if self.cur_state == RunUp else RunDown
+    #
     #     self.cur_state.exit(self.player, None)
     #     self.cur_state = next_state
     #     self.cur_state.enter(self.player, None)
@@ -632,6 +646,7 @@ class StateMachine:
 
 
 class Player:
+    smash_sound = None
     image_idle = None
     image_run = None
     image_jump = None
@@ -660,28 +675,22 @@ class Player:
 
         if Player.image_idle == None:
             Player.image_idle = load_image('./player/playerIdle.png')  # 384 x 43
-        if Player.image_run == None:
             Player.image_run = load_image('./player/playerRun.png')  # 384 x 43
-        if Player.image_jump == None:
             Player.image_jump = load_image('./player/playerSmash.png')  # 416 x 50
-        if Player.image_block == None:
             Player.image_block = load_image('./player/playerBlock.png')  # 416 x 46
-        if Player.image_reception == None:
             Player.image_reception = load_image('./player/playerReception.png')  # 352 x 43 , 11, 32
-        if Player.image_slide == None:
             Player.image_slide = load_image('./player/playerSlide.png')  # 645 x 43 , 15, 43
-        if Player.image_smash == None:
             Player.image_smash = load_image('./player/playerSmash.png')  # 416 x 50 , 13, 32
-        if Player.image_shadow1 == None:
             Player.image_shadow1 = load_image('./player/shadow1.png')  # 23 x 10
-
+            Player.smash_sound = load_wav('./sound/smashs.wav')  # 동시에 여러 음악 재생시 wav로 진행
+            Player.smash_sound.set_volume(24)
 
 
     def update(self):
         if self in play_mode.enemy_team:
             self.state_machine.update()
             self.x = clamp(win_w / 2 + 10, self.x, win_w - 10)
-            self.y = clamp(50, self.y, win_h/3)
+            # self.y = clamp(50, self.y, win_h/3)
         else:
             # 일반 플레이어 업데이트 로직
             self.state_machine.update()

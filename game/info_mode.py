@@ -11,7 +11,10 @@ def init():
     global imagestart
     global imagesui
     global imageexit
-    image = load_image('./background/info.png')
+    global ocean_sound
+    image = load_image('./background/info2.png')
+    ocean_sound = load_music('./sound/ocean.mp3')  # 동시에 여러 음악 재생시 wav로 진행
+    ocean_sound.repeat_play()
 
 
 

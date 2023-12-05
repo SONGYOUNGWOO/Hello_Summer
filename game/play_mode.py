@@ -78,9 +78,7 @@ def restart_game():
         game_world.add_collision_pair('enemy:ball', player, None)
 
 def init():
-    # global image_won
-    # global image_victory
-    # global image_defeat
+
     global beach
     global players
     global enemy_team
@@ -101,14 +99,8 @@ def init():
     n9 = load_image('./number/9.png')
     n0 = load_image('./number/0.png')
 
-    # image_won = load_image('./background/won.png')
-    # image_victory = load_image('./background/victory.png')
-    # image_defeat = load_image('./background/defeat.png')
-
     enemy_score = 0
     ally_score = 0
-
-    running = True
 
     beach = Beach()
     game_world.add_object(beach, 0)
@@ -122,9 +114,8 @@ def init():
     player_slect = players[0]
 
 
-
-    enemy_team = [Player(win_w/2 + 100, win_h/4, 'a'),
-                  Player(win_w - 80, 100, 'b')]
+    enemy_team = [Player(win_w/2 + 100, win_h/4, "RunUp"),
+                  Player(win_w - 150, 100, "RunDown")]
     for player in enemy_team:
         player.face_dir = '왼쪽'  # 모든 적 팀 플레이어를 왼쪽을 바라보도록 설정
         game_world.add_object(player, 1)

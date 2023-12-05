@@ -41,6 +41,7 @@ class Idle:
             ball.dy *= -1
             ball.y += ball.dy * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
 
+    @staticmethod
     def exit(ball, e):
         pass
 
@@ -80,6 +81,7 @@ class Receive:
 
 
 class Smash:
+    @staticmethod
     def enter(ball, e):
         ball.action_start_time = get_time()
         ball.velocity = 2 # 초기 속도 설정
@@ -96,8 +98,6 @@ class Smash:
         if get_time() - ball.action_start_time > 2:  # 시간으로 속도 조정
             ball.velocity = 1
             ball.state_machine.handle_event(('TIME_OUT', 0))
-
-
 
     @staticmethod
     def draw(ball):
@@ -142,7 +142,7 @@ ally_score = 0
 
 class Ball:
     image = None
-    smashs_sound = None
+    ball_sound = None
 
 
 
@@ -158,9 +158,11 @@ class Ball:
         self.left,self.right = self.x - 24,self.x + 20
         self.dx, self.dy = 0, -1
 
-        if not Ball.smashs_sound:
-            Ball.smashs_sound = load_wav('./sound/smashs.wav') #동시에 여러 음악 재생시 wav로 진행
-            Ball.smashs_sound.set_volume(24)
+        if not self.ball_sound:
+            self.ball_sound = load_wav('./sound/ball2.wav') #동시에 여러 음악 재생시 wav로 진행
+            self.ball_sound.set_volume(24)
+            self.sand_sound = load_wav('./sound/sand.wav')
+            self.sand_sound.set_volume(100)
 
     def reset_position(self):
         self.x = 30
@@ -176,6 +178,7 @@ class Ball:
         if self.y >= win_h - 10:
             self.dy = -1  # 아래로 떨어지도록 방향 변경
         if self.y <= 20:  # 공이 바닥에 닿으면
+            self.sand_sound.play()
             if self.x < win_w / 2:
                 enemy_score += 1  # 적팀 점수 증가
             else:
@@ -206,54 +209,30 @@ class Ball:
         pass
 
     def handle_collision(self, group, other):
+
+        self.ball_sound.play()
         if group == 'ball:net':
             if self.x < win_w / 2:
                 self.dx, self.dy = 1, 1
+                self.state_machine.handle_event('IDLE')
+            else:
                 self.state_machine.handle_event('IDLE')
 
         if group == 'player:ball':
             if self.x < win_w / 2:
                 self.dx, self.dy = 1, 1
             if other.action == '스매쉬':
+                self.velocity = 2
                 self.state_machine.handle_event('SMASH')
             else :
                 self.state_machine.handle_event('RECEIVE')
 
         elif group == 'enemy:ball':
             if self.x > win_w / 2:
-                self.dx, self.dy = -1, 1
+                self.dx, self.dy = 1, 1
             if other.action == '스매쉬':
-                Ball.smashs_sound.play()
+                self.velocity = 2
                 self.state_machine.handle_event('SMASH')
             else:
                 self.state_machine.handle_event('RECEIVE')
 
-
-        # MAX_VELOCITY = 2
-        # DECELERATION = 0.2
-        # time_since_action = get_time() - self.action_start_time
-        #
-        # if self.mode == '스매쉬':
-        #     self.dy, self.dx = 1, 1  # 대각선 아래로 이동
-        #     self.velocity = min(self.velocity + DECELERATION, MAX_VELOCITY)
-        #
-        # elif self.mode == '리시브':
-        #     if time_since_action < 0.5:
-        #         self.y += 1  # 위로 상승
-        #     else:
-        #         self.dy = 1  # 아래로 하강
-        #         self.dx = 1  # 오른쪽으로 이동
-        #         self.velocity = min(self.velocity + DECELERATION, MAX_VELOCITY)
-        #
-        # else:
-        #     self.dx, self.dy = 0, 1
-        #     self.velocity += self.GRAVITY * game_framework.frame_time
-        #     self.velocity = max(-MAX_VELOCITY, min(self.velocity, MAX_VELOCITY))
-        #
-        # # 볼의 위치 업데이트
-        # self.x += self.dx * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
-        # self.y += self.dy * RUN_SPEED_PPS * game_framework.frame_time * self.velocity
-        #
-        # self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
-        # self.y = clamp(10, self.y, win_h - 10)
-        # self.x = clamp(10, self.x, win_w - 10)

@@ -43,7 +43,7 @@ class Net:
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 6
 
     def get_bb(self):
-        return self.x - 20, self.y - win_h / 2.4, self.x + 20, self.y + win_h / 4  # 튜플
+        return self.x - 10, self.y - win_h / 2.4, self.x + 10, self.y + win_h / 4  # 튜플
 
     def draw(self):
         self.image.clip_composite_draw(int(self.frame) * 45, 0, 45, 375, - 3.141592 / 100, '',
