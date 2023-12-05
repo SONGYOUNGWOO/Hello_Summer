@@ -506,7 +506,25 @@ class Smash:
         else:
             Player.image_smash.clip_composite_draw(int(player.frame) * 32, 0, 32, 50,
                                                    0, 'h', player.x, player.y, 48, 75)
-
+# class RandomMove:
+#     @staticmethod
+#     def enter(player, e):
+#         player.target_x = random.randint(int(win_w/2 + 100), int(win_w - 80))
+#         player.target_y = random.randint(100, int(win_h/4))
+#
+#     @staticmethod
+#     def do(player):
+#         # target_x, target_y로 이동하는 로직 구현
+#         pass
+#
+#     @staticmethod
+#     def exit(player, e):
+#         pass
+#
+#     @staticmethod
+#     def draw(player):
+#         # 필요한 그리기 로직 (있을 경우)
+#         pass
 
 class StateMachine:
     def __init__(self, player):
@@ -552,27 +570,51 @@ class StateMachine:
     def update(self):
         self.cur_state.do(self.player)
 
-        if self.player in play_mode.enemy_team:
-            if get_time() - self.last_state_change > self.state_duration:
-                self.change_state()
-                self.last_state_change = get_time()
+        if self in play_mode.enemy_team:
+            current_time = get_time()
+            if current_time - self.state_machine.last_state_change > self.state_machine.state_duration:
+                self.state_machine.change_state()
+                self.state_machine.last_state_change = current_time
+
+        # if self.player in play_mode.enemy_team:
+        #     if get_time() - self.last_state_change > self.state_duration:
+        #         self.change_state()
+        #         self.last_state_change = get_time()
 
     def get_state_by_name(self, state_name):
         return {
             "Idle": Idle,
             "RunUp": RunUp,
             "RunDown": RunDown,
+            "Smash" : Smash,
+            "Jump" : Jump
             # 기타 상태 이름과 클래스 매핑...
         }.get(state_name, Idle)
 
     def change_state(self):
-        if self.cur_state == RunUp:
-            next_state = RunDown
-        else:
-            next_state = RunUp
-        self.cur_state.exit(self.player, None)
-        self.cur_state = next_state
-        self.cur_state.enter(self.player, None)
+        if self.player_type == 'a':
+            if self.state_machine.cur_state == RunUp or self.state_machine.cur_state == RunDown:
+                next_state = self.state_machine.get_state_by_name("Smash")
+            else:
+                next_state = self.state_machine.get_state_by_name("RunUp")  # 또는 "RunDown"
+        elif self.player_type == 'b':
+            if self.state_machine.cur_state == RunUp or self.state_machine.cur_state == RunDown:
+                next_state = self.state_machine.get_state_by_name("Jump")
+            else:
+                next_state = self.state_machine.get_state_by_name("RunUp")  # 또는 "RunDown"
+
+        self.state_machine.cur_state.exit(self, None)
+        self.state_machine.cur_state = next_state
+        self.state_machine.cur_state.enter(self, None)
+
+    # def change_state(self):
+    #     if self.cur_state == RunUp:
+    #         next_state = RunDown
+    #     else:
+    #         next_state = RunUp
+    #     self.cur_state.exit(self.player, None)
+    #     self.cur_state = next_state
+    #     self.cur_state.enter(self.player, None)
 
 
     def handle_event(self, e):
@@ -684,156 +726,49 @@ class Player:
         # 다음 캐릭터로 변경
         play_mode.switch_to_next_character()
 
-
-    def set_target_location(self, x=None, y=None):
-        if not x or not y :
-            raise ValueError('위치를 지정을 해야 합니다.')
-        self.tx, self.ty = x, y
-        return BehaviorTree.SUCCESS
-        pass
-
-    def distance_less_than(self, x1, y1, x2, y2, r):
-        distance2 = (x1 - x2)**2 + (y1 - y2)**2
-        return distance2 < (r * PIXEL_PER_METER) ** 2
-        pass
-
-    # dir = radian
-    def move_slightly_to(self, tx, ty):
-        self.dir = math.atan2(ty - self.y, tx - self.x)
-        self.speed = RUN_SPEED_PPS
-        self.x += self.speed * math.cos(self.dir) * game_framework.frame_time
-        self.y += self.speed * math.sin(self.dir) * game_framework.frame_time
-
-    #조금씩 움직이면서 기준 안쪽으로 들어오면
-    def move_to(self, r=0.5):
-        self.state = 'Walk'
-        self.move_slightly_to(self.tx, self.ty)
-        if self.distance_less_than(self.tx, self.ty, self.x, self.y, r):
-            return BehaviorTree.SUCCESS
-        else:
-            return BehaviorTree.RUNNING
-
-
-    def set_random_location(self):
-        self.tx, self.ty = random.randint(100,1000-100), random.randint(100, 800-100)
-        pass
-
-    def is_boy_nearby(self, r):
-        if self.distance_less_than(play_mode.boy.x, play_mode.boy.y, self.x, self.y, r):
-            return BehaviorTree.SUCCESS
-        else:
-            return BehaviorTree.FAIL
-        pass
-
-    def move_to_boy(self, r=0.5):
-        self.state = 'Walk'
-        self.move_slightly_to(play_mode.boy.x, play_mode.boy.y)
-        if self.distance_less_than(play_mode.boy.x, play_mode.boy.y, self.x, self.y, r):
-            return BehaviorTree.SUCCESS
-        else:
-            return BehaviorTree.RUNNING
-
-    def run_away_to_boy(self, r=0.5):
-        self.state = 'Walk'
-
-        # 소년과 좀비 사이의 (방향)을 계산
-        dx = self.x - play_mode.boy.x
-        dy = self.y - play_mode.boy.y
-
-        # 도망칠 위치 설정 (현재 좀비 위치에서 소년과의 차이만큼 더 이동)
-        escape_x = self.x + dx
-        escape_y = self.y + dy
-
-        # 도망칠 위치로 이동
-        self.move_slightly_to(escape_x, escape_y)
-
-        # 소년과의 거리가 충분히 멀어졌는지 체크
-        if self.distance_less_than(play_mode.boy.x, play_mode.boy.y, self.x, self.y, r) > 7:
-            return BehaviorTree.SUCCESS
-        else:
-            return BehaviorTree.RUNNING
-
-
-    def get_patrol_location(self):
-        self.tx, self.ty = self.patrol_locations[self.loc_no]
-        self.loc_no = (self.loc_no + 1) % len(self.patrol_locations)
-        return BehaviorTree.SUCCESS
-        pass
-
-    def is_player_substitution(self):
-        if play_mode.player_slect != self:
-            return BehaviorTree.SUCCESS
-        else:
-            return BehaviorTree.FAIL
-
-    def is_ball_ground(self):
-        if play_mode.ball.y == 10:
-            return BehaviorTree.SUCCESS
-        else:
-            return BehaviorTree.FAIL
-
-
-    def move_relatively(self):
-        self.sp_w, self.sp_h = win_w/4, win_w/4
-        if self.difp == None :
-            for player in play_mode.players:
-                if player != self:
-                    self.difp = player
-
-    def next_round(self):
-        return BehaviorTree.SUCCESS
-
-    def close_to_the_ball(self):
-        p1x, p1y =  play_mode.player[0].x,  play_mode.player[0].y
-        p2x, p2y =  play_mode.player[1].x,  play_mode.player[1].y
-        ball_x, ball_y = play_mode.ball.x, play_mode.ball.y
-
-        distance_to_p1 = math.sqrt((ball_x - p1x) ** 2 + (ball_y - p1y) ** 2)
-        distance_to_p2 = math.sqrt((ball_x - p2x) ** 2 + (ball_y - p2y) ** 2)
-
-        if distance_to_p1 < distance_to_p2:
-            return play_mode.player[0]
-        elif distance_to_p2 < distance_to_p1:
-            return play_mode.player[1]
-        else: #거리가 같음
-            return play_mode.player[0]
-
-    def is_ball_net_over(self):
-        if play_mode.ball.x > win_w/2: #우측 라인
-            return BehaviorTree.SUCCESS
-
-    def jump_spike(self):
-        # 벽에 가장 가까운 플레이어 찾기
-        closest_player = min(play_mode.player, key=lambda p: p.x)
-
-        # 이 플레이어의 StateMachine 상태를 Smash로 설정
-        closest_player.state_machine.cur_state = Smash
-        closest_player.state_machine.cur_state.enter(closest_player, ('NONE', 0))
-
-        # 공의 위치와 방향 설정
-        play_mode.ball.x = closest_player.x
-        play_mode.ball.y = closest_player.y + 50  # 플레이어의 높이 위로 설정
-
-        # 공을 상대 진형으로 넘기기 위한 속도 및 방향 설정
-        # 예시: 공에 대한 속도와 방향 벡터 설정
-        play_mode.ball.velocity_x = 300  # X축 속도
-        play_mode.ball.velocity_y = 400  # Y축 속도 (양의 값이면 위로, 음의 값이면 아래로)
-
-        # 스매쉬 동작에 필요한 추가 애니메이션 또는 상태 변화 로직
-        # 예: 애니메이션 프레임 설정, 특정 시간 후 상태 변경 등
-    def do_serve(self):
-        pass
-
-
-
-
-    def build_behavior_tree(self):
-        c1 = Condition('공이 땅에 닿았는가?', self.is_ball_ground)
-        a1 = Action('다음 라운드', self.next_round)
-
-        SEQ_next_round = Sequence('다음라운드 ', c1, a1)
-
-        c2 = Condition('서브인가?', self.is_ball_net_over)
-        SEQ_ATTACK = Sequence('공격',)
-
-        # self.bt = BehaviorTree(root)
+    # def is_near_net(play_mode.enemy_team):
+    #     if enemy_team[0]< enemy_team[1]:
+    #         return  player[0]
+    #
+    #
+    # # 행동 트리 노드 정의
+    # class BtSmash(Action):
+    #     def __init__(self, player):
+    #         super().__init__()
+    #         self.player = player
+    #
+    #     def run(self):
+    #         # 원래 Smash 클래스의 동작을 수행
+    #         result = self.player.perform_smash()  # 가상의 메소드, 실제 구현 필요
+    #         return BehaviorTree.SUCCESS if result else BehaviorTree.FAIL
+    #
+    # class BtSlide(Action):
+    #     def __init__(self, player):
+    #         super().__init__()
+    #         self.player = player
+    #
+    #     def run(self):
+    #         # 원래 Slide 클래스의 동작을 수행
+    #         result = self.player.perform_slide()  # 가상의 메소드, 실제 구현 필요
+    #         return BehaviorTree.SUCCESS if result else BehaviorTree.FAIL
+    # class MoveRandomly(Action):
+    #     def run(self):
+    #         # 무작위로 이동하는 행동 구현
+    #         pass
+    #
+    # # 조건 노드 정의
+    # class NearNet(Condition):
+    #     def run(self):
+    #         return is_near_net(play_mode.enemy_team, net)
+    #
+    # # 행동 트리 구성
+    # def build_behavior_tree(player):
+    #     root = Selector(name="Root")
+    #     spike_sequence = Sequence(name="Spike Sequence")
+    #     move_sequence = Sequence(name="Move Sequence")
+    #
+    #     spike_sequence.add_children(NearNet(player), Spike(player))
+    #     move_sequence.add_children(Slide(player), MoveRandomly(player))
+    #
+    #     root.add_children(spike_sequence, move_sequence)
+    #     return BehaviorTree(root)

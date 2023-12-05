@@ -2,7 +2,7 @@ import random
 
 from pico2d import *
 import game_framework
-
+import finish_mode
 import game_world
 from background import Beach
 from background import Net
@@ -78,6 +78,9 @@ def restart_game():
         game_world.add_collision_pair('enemy:ball', player, None)
 
 def init():
+    # global image_won
+    # global image_victory
+    # global image_defeat
     global beach
     global players
     global enemy_team
@@ -98,6 +101,10 @@ def init():
     n9 = load_image('./number/9.png')
     n0 = load_image('./number/0.png')
 
+    # image_won = load_image('./background/won.png')
+    # image_victory = load_image('./background/victory.png')
+    # image_defeat = load_image('./background/defeat.png')
+
     enemy_score = 0
     ally_score = 0
 
@@ -114,8 +121,10 @@ def init():
         game_world.add_object(player, 1)
     player_slect = players[0]
 
-    enemy_team = [Player(win_w/2 + 100, win_h/4, "RunUp"),
-                  Player(win_w - 80, 100, "RunDown")]
+
+
+    enemy_team = [Player(win_w/2 + 100, win_h/4, 'a'),
+                  Player(win_w - 80, 100, 'b')]
     for player in enemy_team:
         player.face_dir = '왼쪽'  # 모든 적 팀 플레이어를 왼쪽을 바라보도록 설정
         game_world.add_object(player, 1)
@@ -160,11 +169,14 @@ def update():
     global enemy_score, ally_score
     print(ball.y)
     if ball.y <= 100:  # 예: 바닥에 닿는 y값
-        if ball.x > win_w / 2:
+        if ball.x < win_w / 2:
             enemy_score += 1
         else:
             ally_score += 1
         ball.reset_position()
+
+    if ally_score >= 5 or enemy_score >= 5:
+        game_framework.change_mode(finish_mode)
 
         # fill here
     # for ball in balls.copy():
@@ -189,8 +201,8 @@ def draw_number(x, y, number, scale=0.1):
 def draw():
     clear_canvas()
     game_world.render()
-    draw_number(50, win_h - 50, enemy_score, scale=5 )  # 적 점수
-    draw_number(win_w - 100, win_h - 50, ally_score, scale=5)  # 아군 점수
+    draw_number(50, win_h - 50, ally_score, scale=5 )  # 적 점수
+    draw_number(win_w - 100, win_h - 50, enemy_score, scale=5)  # 아군 점수
     update_canvas()
 
 
