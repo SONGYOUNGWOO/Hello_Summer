@@ -60,14 +60,19 @@ class Receive:
 
     @staticmethod
     def do(ball):
-        ball.x += ball.dx * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+        ball.x += ball.dx * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time * 0.7
         ball.y += ball.dy * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+
         if (ball.dx < 0 and ball.left <= 10) or (ball.dx > 0 and ball.right >= win_w - 10):
             ball.dx *= -1
             ball.x += ball.dx * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
         if (ball.dy < 0 and ball.btm <= 0) or (ball.dy > 0 and ball.top >= win_h - 10):
             ball.dy *= -1
             ball.y += ball.dy * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+
+        if get_time() - ball.action_start_time > 2:  # 시간으로 속도 조정
+            ball.velocity = 1
+            ball.state_machine.handle_event(('TIME_OUT', 0))
 
     @staticmethod
     def draw(ball):
@@ -86,9 +91,9 @@ class Smash:
 
     @staticmethod
     def do(ball):
-        ball.x += ball.dx * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+        ball.x += ball.dx * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time * 0.5
         ball.y += ball.dy * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
-        if get_time() - ball.action_start_time > 1.5:  # 시간으로 속도 조정
+        if get_time() - ball.action_start_time > 2:  # 시간으로 속도 조정
             ball.velocity = 1
             ball.state_machine.handle_event(('TIME_OUT', 0))
 
@@ -201,12 +206,17 @@ class Ball:
         pass
 
     def handle_collision(self, group, other):
+        if group == 'ball:net':
+            if self.x < win_w / 2:
+                self.dx, self.dy = 1, 1
+                self.state_machine.handle_event('IDLE')
+
         if group == 'player:ball':
             if self.x < win_w / 2:
                 self.dx, self.dy = 1, 1
             if other.action == '스매쉬':
                 self.state_machine.handle_event('SMASH')
-            elif other.action == '슬라이드' or other.action == '리시브':
+            else :
                 self.state_machine.handle_event('RECEIVE')
 
         elif group == 'enemy:ball':
@@ -215,7 +225,7 @@ class Ball:
             if other.action == '스매쉬':
                 Ball.smashs_sound.play()
                 self.state_machine.handle_event('SMASH')
-            elif other.action == '슬라이드' or other.action == '리시브':
+            else:
                 self.state_machine.handle_event('RECEIVE')
 
 

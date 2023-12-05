@@ -494,9 +494,9 @@ class Smash:
     def do(player):
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 13
         player.y += RUN_SPEED_PPS * game_framework.frame_time * 3
-        if get_time() - player.wait_time > 0.3:  # 시간으로 속도 조정
+        if get_time() - player.wait_time > 0.4:  # 시간으로 속도 조정
             player.y -= (RUN_SPEED_PPS * game_framework.frame_time) * 6
-        if get_time() - player.wait_time > 0.6:
+        if get_time() - player.wait_time > 0.8:
             player.state_machine.handle_event(('TIME_OUT', 0))
 
     @staticmethod

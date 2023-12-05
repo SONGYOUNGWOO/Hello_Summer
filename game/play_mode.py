@@ -126,6 +126,8 @@ def init():
     game_world.add_collision_pair('player:net', None, net)
     for player in players:
         game_world.add_collision_pair('player:net', player, None)
+    game_world.add_collision_pair('ball:net', None, net)
+    game_world.add_collision_pair('ball:net', ball, None)
 
     game_world.add_collision_pair('player:ball', None, ball)
     for player in players:
