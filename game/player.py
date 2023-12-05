@@ -509,25 +509,6 @@ class Smash:
         else:
             Player.image_smash.clip_composite_draw(int(player.frame) * 32, 0, 32, 50,
                                                    0, 'h', player.x, player.y, 48, 75)
-# class RandomMove:
-#     @staticmethod
-#     def enter(player, e):
-#         player.target_x = random.randint(int(win_w/2 + 100), int(win_w - 80))
-#         player.target_y = random.randint(100, int(win_h/4))
-#
-#     @staticmethod
-#     def do(player):
-#         # target_x, target_y로 이동하는 로직 구현
-#         pass
-#
-#     @staticmethod
-#     def exit(player, e):
-#         pass
-#
-#     @staticmethod
-#     def draw(player):
-#         # 필요한 그리기 로직 (있을 경우)
-#         pass
 
 class StateMachine:
     def __init__(self, player):
@@ -538,24 +519,24 @@ class StateMachine:
         self.transitions = {
             Idle: {D_down: RunRight, A_down: RunLeft, A_up: RunRight, D_up: RunLeft, W_down: RunUp,
                    S_down: RunDown, W_up: RunDown, S_up: RunUp,I_down: Slide,
-                   space_down: Jump, P_down: Reception, O_down: Smash,U_down: self.player.change_character },
+                   space_down: Jump, P_down: Reception, O_down: Smash,U_down: self.player.change_character},
             RunRight: {D_up: Idle, A_down: Idle, A_up: Idle, W_down: RunRightUp, W_up: RunRightDown,
                        S_down: RunRightDown, S_up: RunRightUp,space_down: Jump,
-                       P_down: Reception, U_down:self.player.change_character},
+                       P_down: Reception, },
             RunDown: {S_up: Idle, A_down: RunLeftDown, W_down: Idle, D_down: RunRightDown,
                       A_up: RunRightDown, D_up: RunLeftDown, space_down: Jump,
-                      P_down: Reception, U_down: self.player.change_character},
+                      P_down: Reception, },
             RunLeft: {A_up: Idle, W_down: RunLeftUp, D_down: Idle, D_up: Idle, S_down: RunLeftDown,
                       W_up: RunLeftDown, S_up: RunLeftUp,
-                      space_down: Jump, P_down: Reception, U_down: self.player.change_character},
+                      space_down: Jump, P_down: Reception, },
             RunUp: {W_up: Idle, A_down: RunLeftUp, D_down: RunRightUp,
                     A_up: RunRightUp, D_up: RunLeftUp},
             RunRightUp: {W_up: RunRight, D_up: RunUp, A_down: RunUp, S_down: RunRight},
             RunLeftUp: {D_down: RunUp, S_down: RunLeft, A_up: RunUp, W_up: RunLeft},
             RunLeftDown: {A_up: RunDown, S_up: RunLeft, W_down: RunLeft, D_down: RunDown,
-                          space_down: Jump, P_down: Reception, U_down:self.player.change_character},
+                          space_down: Jump, P_down: Reception,},
             RunRightDown: {D_up: RunDown, S_up: RunRight, A_down: RunDown, W_down: RunRight
-                           ,space_down: Jump, P_down: Reception, U_down:self.player.change_character},
+                           ,space_down: Jump, P_down: Reception, },
             Jump: {time_out: Idle, },
             Reception: {D_down: RunRight, A_down: RunLeft, D_up: Idle, A_up: Idle,
                         W_down: RunUp, S_down: RunDown, W_up: Idle, S_up: Idle,
@@ -606,28 +587,6 @@ class StateMachine:
         self.cur_state = next_state
         self.cur_state.enter(self.player, None)
 
-    # def change_state(self):
-    #     if self.cur_state == RunUp:
-    #         if self.cur_state == RunUp:
-    #             if self.cur_state == Idle:
-    #                 next_state = random.choice([RunDown, Smash, Jump])
-    #         else:
-    #             # 그렇지 않은 경우 RunUp과 RunDown을 번갈아 선택
-    #             if self.cur_state == Idle:
-    #                 next_state = RunDown if self.cur_state == RunDown else RunUp
-    #     else:
-    #         if self.cur_state == RunDown:
-    #             if self.cur_state == Idle:
-    #                 next_state = random.choice([RunUp, Smash, Jump])
-    #         else:
-    #             # 그렇지 않은 경우 RunUp과 RunDown을 번갈아 선택
-    #             if self.cur_state == Idle:
-    #                 next_state = RunUp if self.cur_state == RunUp else RunDown
-    #
-    #     self.cur_state.exit(self.player, None)
-    #     self.cur_state = next_state
-    #     self.cur_state.enter(self.player, None)
-
 
     def handle_event(self, e):
         for check_event, next_state in self.transitions[self.cur_state].items():
@@ -654,6 +613,7 @@ class Player:
     image_smash = None
     image_shadow1 = None
     jump_sound = None
+
 
 
     def __init__(self, x = 50, y = win_h / 2.6 , initial_state_name="Idle"):
@@ -710,7 +670,7 @@ class Player:
             self.image_shadow1.clip_draw(0,0,23,10,self.x,  self.shadow_y ,22,10)  # 그림자의 위치를 플레이어 아래로 조정
         # self.font.draw(self.x - 10, self.y + 50, f'{self.ball_count:02d}', (255, 255, 0))
         # # 디버그용 바운딩박스 그리기
-        draw_rectangle(*self.get_bb())  # 튜플을 풀어헤쳐서 인자로 전달.
+        #draw_rectangle(*self.get_bb())  # 튜플을 풀어헤쳐서 인자로 전달.
 
     def get_bb(self):
         return self.x - 20, self.y - 30, self.x + 20, self.y + 30  # 튜플

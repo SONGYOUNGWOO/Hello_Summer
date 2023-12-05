@@ -20,6 +20,7 @@ def switch_to_next_character():
     next_index = (current_index + 1) % len(players)
     player_slect = players[next_index]
 
+
 def handle_events():
 
     events = get_events()
@@ -34,7 +35,6 @@ def handle_events():
 
         elif event.type == SDL_KEYDOWN and event.key == SDLK_r:
             restart_game()
-
         else:
             player_slect.handle_event(event)
 def restart_game():
@@ -50,7 +50,7 @@ def restart_game():
     net = Net()
     game_world.add_object(net, 0)
 
-    players = [Player(win_w/2- 80, win_h/4), Player(80, 100)]
+    players = [Player(80, 100), Player(win_w/2 - 80, win_h/4)]
     for player in players:
         game_world.add_object(player, 1)
     player_slect = players[0]
@@ -87,6 +87,7 @@ def init():
     global player_slect
     global enemy_score, ally_score
     global n1,n2,n3,n4,n5,n6,n7,n8,n9,n0
+    global diamond
 
     n1 = load_image('./number/1.png')
     n2 = load_image('./number/2.png')
@@ -98,6 +99,7 @@ def init():
     n8 = load_image('./number/8.png')
     n9 = load_image('./number/9.png')
     n0 = load_image('./number/0.png')
+    diamond = load_image('./player/diamond.png')
 
     enemy_score = 0
     ally_score = 0
@@ -158,7 +160,7 @@ def update():
     game_world.handle_collisions()
 
     global enemy_score, ally_score
-    print(ball.y)
+    #print(ball.y)
     if ball.y <= 100:  # 예: 바닥에 닿는 y값
         if ball.x < win_w / 2:
             enemy_score += 1
@@ -192,6 +194,7 @@ def draw_number(x, y, number, scale=0.1):
 def draw():
     clear_canvas()
     game_world.render()
+    diamond.draw(player_slect.x + 5, player_slect.y + 40, 10, 10)
     draw_number(100, win_h - 50, ally_score, scale=5 )  # 적 점수
     draw_number(win_w - 100, win_h - 50, enemy_score, scale=5)  # 아군 점수
     update_canvas()

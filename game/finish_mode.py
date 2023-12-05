@@ -67,7 +67,7 @@ def handle_events():
         elif event.type == SDL_MOUSEBUTTONDOWN:
             # Get mouse click coordinates
             mouse_x, mouse_y = event.x, win_h - 1 - event.y  # Adjust for SDL coordinate system if necessary
-            print(mouse_x, mouse_y)
+            #print(mouse_x, mouse_y)
             # Check if click is within the imagestart area
             if (90 <= mouse_x <= 250) and (270 <= mouse_y <= 330):
                 game_framework.change_mode(info_mode)

@@ -95,6 +95,13 @@ class Smash:
     def do(ball):
         ball.x += ball.dx * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time * 0.5
         ball.y += ball.dy * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+        if (ball.dx < 0 and ball.left <= 10) or (ball.dx > 0 and ball.right >= win_w - 10):
+            ball.dx *= -1
+            ball.x += ball.dx * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+        if (ball.dy < 0 and ball.btm <= 0) or (ball.dy > 0 and ball.top >= win_h - 10):
+            ball.dy *= -1
+            ball.y += ball.dy * ball.velocity * RUN_SPEED_PPS * game_framework.frame_time
+
         if get_time() - ball.action_start_time > 2:  # 시간으로 속도 조정
             ball.velocity = 1
             ball.state_machine.handle_event(('TIME_OUT', 0))
@@ -112,8 +119,8 @@ class StateMachine:
 
         self.transitions = {
             Idle: {'RECEIVE': Receive, 'SMASH': Smash, },
-            Receive: {'TIME_OUT': Idle},
-            Smash: {'TIME_OUT': Idle},
+            Receive: {time_out: Idle},
+            Smash: {time_out: Idle},
         }
 
     def update(self):
@@ -199,7 +206,7 @@ class Ball:
     def draw(self):
         self.state_machine.draw()
         self.draw_score()  # 점수를 화면에 출력하는 함수 호출
-        draw_rectangle(*self.get_bb())
+        #draw_rectangle(*self.get_bb())
 
     def draw_score(self):
         # 점수를 화면에 출력하는 함수
